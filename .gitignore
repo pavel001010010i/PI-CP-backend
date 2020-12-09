@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #folder target
 
 target
@@ -5,4 +6,13 @@ bin
 obj
 .vs
 *.log
+=======
+#folder target
+
+target
+bin
+obj
+.vs
+*.log
+>>>>>>> 636e935ce7ad1ee65ef2a134b8d667e14d2a7e84
 *.db
