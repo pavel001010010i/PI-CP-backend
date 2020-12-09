@@ -1,8 +1,0 @@
-#folder target
-
-target
-bin
-obj
-.vs
-*.log
-*.db
