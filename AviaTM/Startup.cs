@@ -1,3 +1,5 @@
+using AviaTM.Interfaces;
+using AviaTM.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,8 +33,7 @@ namespace AviaTM
             {
                 options.UseNpgsql(
                     Configuration.GetConnectionString("DefaultConnection"),
-                    assembly =>
-                            assembly.MigrationsAssembly("AviaTM"));
+                    assembly =>assembly.MigrationsAssembly("AviaTM"));
             });
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer(options =>
@@ -40,21 +41,12 @@ namespace AviaTM
                         options.RequireHttpsMetadata = false;
                         options.TokenValidationParameters = new TokenValidationParameters
                         {
-                            // укзывает, будет ли валидироваться издатель при валидации токена
                             ValidateIssuer = true,
-                            // строка, представляющая издателя
                             ValidIssuer = AuthOptions.ISSUER,
-
-                            // будет ли валидироваться потребитель токена
                             ValidateAudience = true,
-                            // установка потребителя токена
                             ValidAudience = AuthOptions.AUDIENCE,
-                            // будет ли валидироваться время существования
                             ValidateLifetime = true,
-
-                            // установка ключа безопасности
                             IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),   
-                            // валидация ключа безопасности
                             ValidateIssuerSigningKey = true,
                         };
                     });
@@ -62,6 +54,18 @@ namespace AviaTM
             services.AddControllers();
             services.AddRazorPages();
             services.AddCors();
+
+            services.AddTransient<IAccountRepository, AccountRepository>();
+            services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<ICustomersRepository, CustomersRepository>();
+            services.AddTransient<IProviderRepository, ProviderRepository>();
+            services.AddTransient<ICargoRepository, CargoRepository>();
+            services.AddTransient<ICountryRepository, CountryRepository>();
+            services.AddTransient<IPlaneRepository, PlaneRepository>();
+            services.AddTransient<IRequestUserRepository, RequestUserRepository>();
+            services.AddTransient<IRDRepository, RDRepository>();
+            services.AddTransient<IOrderRepository, OrderRepository>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

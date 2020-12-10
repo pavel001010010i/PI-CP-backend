@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using AviaTM;
 using AviaTM.Models;
 using Microsoft.AspNetCore.Authorization;
+using AviaTM.Interfaces;
 
 namespace AviaTM.Controllers
 {
@@ -15,26 +16,20 @@ namespace AviaTM.Controllers
     [ApiController]
     public class PlanesController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-
-        public PlanesController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly IPlaneRepository _repository;
+        public PlanesController(IPlaneRepository context) => _repository = context;
 
         [Authorize(Roles = "admin,provider")]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Plane>>> GetPlane()
+        public async Task<ActionResult<List<Plane>>> GetPlane()
         {
             if (User.IsInRole("admin"))
             {
-                var plane = _context.Plane.Include(p => p.Provider);
-                return await plane.ToListAsync();
+                return await _repository.GetPlanesAdmin();
             }
             else
             {
-                var plane = _context.Plane.Include(p => p.Provider).Where(x => x.Provider.Email == User.Identity.Name);
-                return await plane.ToListAsync();
+                return await _repository.GetPlanesUser(User);
             }
         }
 
@@ -42,8 +37,7 @@ namespace AviaTM.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Plane>> GetPlane(int id)
         {
-            var plane = await _context.Plane.FindAsync(id);
-
+            var plane = await _repository.GetPlane(id);
             if (plane == null)
             {
                 return NotFound();
@@ -56,47 +50,22 @@ namespace AviaTM.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<object>> PutPlane(int id, Plane plane)
         {
-            if (id != plane.Id)
+            var planeEx = await _repository.GetPlane(id);
+            if (planeEx == null)
             {
                 return BadRequest();
             }
-
-            _context.Entry(plane).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-                var response = new
-                {
-                    succes = true,
-                    message = "User update!"
-                };
-                return response;
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PlaneExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
+            return await _repository.UpdatePlane(plane);
         }
 
         [Authorize(Roles = "admin,provider")]
         [HttpPost]
         public async Task<ActionResult<object>> PostPlane(PlaneBody planeBody)
         {
-            Provider provider = _context.Provider.Where(x => x.NameCompany == planeBody.NameCompany).FirstOrDefault();
-            Provider newProv = provider;
-            provider = null;
+            Provider provider = await _repository.GetProvider(planeBody);
             Plane plane = new Plane()
             {
-                IdProvider = newProv.ProviderId,
+                IdProvider = provider.ProviderId,
                 NamePlane = planeBody.NamePlane,
                 ModelPlane = planeBody.ModelPlane,
                 Height = planeBody.Height,
@@ -104,36 +73,20 @@ namespace AviaTM.Controllers
                 depth = planeBody.depth,
                 CapacityWeight = planeBody.CapacityWeight
             };
-            _context.Plane.Add(plane);
-            await _context.SaveChangesAsync();
-            var response = new
-            {
-                succes = true,
-                message = "Plane add"
-            };
-            
-            return response;
+            return await _repository.AddPlane(plane);
         }
 
         [Authorize(Roles = "admin,provider")]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePlane(int id)
+        public async Task<ActionResult<object>> DeletePlane(int id)
         {
-            var plane = await _context.Plane.FindAsync(id);
+            var plane = await _repository.GetPlane(id);
             if (plane == null)
             {
                 return NotFound();
             }
 
-            _context.Plane.Remove(plane);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool PlaneExists(int id)
-        {
-            return _context.Plane.Any(e => e.Id == id);
+            return await _repository.RemovePlane(plane);
         }
     }
 }

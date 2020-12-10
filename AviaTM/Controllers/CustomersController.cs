@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AviaTM;
 using AviaTM.Models;
+using AviaTM.Interfaces;
 
 namespace AviaTM.Controllers
 {
@@ -14,21 +15,18 @@ namespace AviaTM.Controllers
     [ApiController]
     public class CustomersController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ICustomersRepository _repository;
 
-        public CustomersController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        public CustomersController(ICustomersRepository context) => _repository = context;
 
         // GET: api/Customers
         [HttpGet]
 
-        public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
+        public async Task<ActionResult<List<Customer>>> GetCustomers()
         {
             List<Customer> customers = new List<Customer>();
-            var cust = await _context.Customers.ToListAsync();
-            var user = _context.User.Where(x => x.LockoutEnable == false).ToList();
+            var cust = await _repository.GetCustomers();
+            var user = _repository.GetUserWhere();
             if (User.IsInRole("admin"))
             {
                 foreach(var i in cust)
@@ -45,7 +43,7 @@ namespace AviaTM.Controllers
             }
             else
             {
-                return await _context.Customers.Where(x => x.Email == User.Identity.Name).ToListAsync();
+                return await _repository.GetCustomersWhere(User);
             }
             
         }
@@ -54,7 +52,7 @@ namespace AviaTM.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Customer>> GetCustomer(int id)
         {
-            var customer = await _context.Customers.FindAsync(id);
+            var customer = await _repository.GetCustomer(id);
 
             if (customer == null)
             {
@@ -69,37 +67,18 @@ namespace AviaTM.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<object>> PutCustomer(int id, Customer customer)
         {
-            if (id != customer.Id)
+            var existingCustomer = await _repository.GetCustomer(customer.Id);
+            if (existingCustomer == null)
             {
-                var response = new
+                var respons = new
                 {
                     exist = false,
-                    message = "User not adding!"
+                    message = "User not update!"
                 };
-                return response;
+                return respons;
             }
-            _context.Entry(customer).State = EntityState.Modified;
-            try
-            {
-                await _context.SaveChangesAsync();
-                var response = new
-                {
-                    exist = true,
-                    message = "User update!"
-                };
-                return response;
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CustomerExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            var response = await _repository.UpdateCustomer(customer);
+            return response;
         }
 
         // POST: api/Customers
@@ -124,14 +103,12 @@ namespace AviaTM.Controllers
                 Role = customerBody.Role,
                 LockoutEnable = true
             };
-            var userCust = await _context.Customers.FirstOrDefaultAsync(x => x.Email.Contains(customerBody.Email));
-            var user1 = await _context.User.FirstOrDefaultAsync(x => x.Login.Contains(customerBody.Email));
+            var userCust = await _repository.GetCustomer(customerBody);
+            var user1 = await _repository.GetUser(customerBody);
             if (userCust == null&& user1== null)
             {
-                await _context.User.AddAsync(user);
-                await _context.SaveChangesAsync();
-                await _context.Customers.AddAsync(customer);
-                await _context.SaveChangesAsync();
+                await _repository.AddUser(user);
+                await _repository.AddCustomer(customer);
                 var response = new
                 {
                     exist = true,
@@ -155,21 +132,15 @@ namespace AviaTM.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCustomer(int id)
         {
-            var customer = await _context.Customers.FindAsync(id);
+            var customer = await _repository.GetCustomer(id);
             if (customer == null)
             {
                 return NotFound();
             }
 
-            _context.Customers.Remove(customer);
-            await _context.SaveChangesAsync();
+            await _repository.RemoveCustomer(customer);
 
             return NoContent();
-        }
-
-        private bool CustomerExists(int id)
-        {
-            return _context.Customers.Any(e => e.Id == id);
         }
     }
 }

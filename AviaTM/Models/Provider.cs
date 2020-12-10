@@ -29,6 +29,15 @@ namespace AviaTM.Models
 
 
     }
+    public class ProviderRD
+    {
+        public int Height { get; set; }
+        public int Width { get; set; }
+        public int Depth { get; set; }
+        public int Weight { get; set; }
+        public string CountryTo { get; set; }
+        public string CountryFrom { get; set; }
+    }
     public class ProviderBody
     {
         public int ProviderId { get; set; }

@@ -9,6 +9,7 @@ using AviaTM;
 using AviaTM.Models;
 using Microsoft.AspNetCore.Authorization;
 using AviaTM.methods;
+using AviaTM.Interfaces;
 
 namespace AviaTM.Controllers
 {
@@ -16,13 +17,9 @@ namespace AviaTM.Controllers
     [ApiController]
     public class RequestDeliveriesController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-        
-        public RequestDeliveriesController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
-        
+        private readonly IRDRepository _repository;
+        public RequestDeliveriesController(IRDRepository context) => _repository = context;
+
         [HttpPost("/getDis")]
         public async Task<ActionResult<object>> GetDistance([FromBody]Coordinates coordinates)
         {
@@ -45,9 +42,9 @@ namespace AviaTM.Controllers
                 };
                 return response;
             }
-            var customerId = _context.Customers.FirstOrDefault(x => x.Email == rd.CustomerEmail).Id;
-            var cargoId = _context.Cargo.FirstOrDefault(x => x.Name == rd.CargoName).Id;
-            var isCargoExistForRD = _context.RequestDeliveries.FirstOrDefault(x => x.CargoId == cargoId);
+            var customerId = await _repository.GetCustomerId(rd.CustomerEmail);
+            var cargoId = await _repository.GetCargoId(rd.CargoName);
+            var isCargoExistForRD = await _repository.GetRD(cargoId);
             if (isCargoExistForRD!=null)
             {
                 var response = new
@@ -57,7 +54,7 @@ namespace AviaTM.Controllers
                 };
                 return response;
             }
-            var isCargoExistOrder = await _context.Order.FirstOrDefaultAsync(x => x.CargoId == cargoId);
+            var isCargoExistOrder = await _repository.GetOrder(cargoId);
 
             if (isCargoExistOrder != null)
             {
@@ -83,8 +80,7 @@ namespace AviaTM.Controllers
                     StatusRequest = true
                 };
 
-                _context.RequestDeliveries.Add(request);
-                await _context.SaveChangesAsync();
+                await _repository.AddRD(request);
                 var response = new
                 {
                     succes = true,
@@ -99,105 +95,71 @@ namespace AviaTM.Controllers
         // GET: api/RequestDeliveries
         //[Authorize]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<RequestDelivery>>> GetRequestDeliveries()
+        public async Task<ActionResult<List<RequestDelivery>>> GetRequestDeliveries()
         {
             if (User.IsInRole("admin"))
             {
-                return await _context.RequestDeliveries
-                    .Include(x => x.Customer)
-                    .Include(x =>x.Provider)
-                    .Include(x=>x.Cargo)
-                    .Include(x=>x.Country).ToListAsync();
+                return await _repository.GetRDAdmin();
             }
             if (User.IsInRole("provider"))
             {
-                return await _context.RequestDeliveries
-                      .Include(x => x.Customer)
-                      .Include(x => x.Provider).Where(x => x.Provider.Email == User.Identity.Name)
-                      .Include(x => x.Cargo)
-                      .Include(x => x.Country).ToListAsync();
+                return await _repository.GetRDProvider(User);
 
             }
-            return await _context.RequestDeliveries
-                    .Include(x => x.Customer).Where(x => x.Customer.Email == User.Identity.Name)
-                    .Include(x => x.Provider)
-                    .Include(x => x.Cargo)
-                    .Include(x => x.Country).ToListAsync();
+            return await _repository.GetRDCustomer(User);
         }
 
         // GET: api/RequestDeliveries/5
         [HttpGet("{id}")]
         public async Task<ActionResult<RequestDelivery>> GetRequestDelivery(int id)
         {
-            var requestDelivery = await _context.RequestDeliveries.FindAsync(id);
+            var requestDelivery = await _repository.GetRDOriginal(id);
 
             if (requestDelivery == null)
             {
                 return NotFound();
             }
-
             return requestDelivery;
         }
 
         // PUT: api/RequestDeliveries/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutRequestDelivery(int id, RequestDelivery requestDelivery)
+        public async Task<ActionResult<object>> PutRequestDelivery(int id, RequestDelivery requestDelivery)
         {
-            if (id != requestDelivery.IdRequest)
+            var requestDeliveryEx = await _repository.GetRDOriginal(id);
+            if (requestDeliveryEx== null)
             {
                 return BadRequest();
             }
 
-            _context.Entry(requestDelivery).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!RequestDeliveryExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return await _repository.UpdateRD(requestDelivery);
         }
 
         // POST: api/RequestDeliveries
         [HttpPost]
-        public async Task<ActionResult<RequestDelivery>> PostRequestDelivery(RequestDelivery requestDelivery)
+        public async Task<ActionResult<object>> PostRequestDelivery(RequestDelivery requestDelivery)
         {
-            _context.RequestDeliveries.Add(requestDelivery);
-            await _context.SaveChangesAsync();
+            await _repository.AddRD(requestDelivery);
 
-            return CreatedAtAction("GetRequestDelivery", new { id = requestDelivery.IdRequest }, requestDelivery);
+            var response = new
+            {
+                succes = true,
+                message = "Application form completed"
+            };
+            return response;
         }
 
         // DELETE: api/RequestDeliveries/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRequestDelivery(int id)
+        public async Task<ActionResult<object>> DeleteRequestDelivery(int id)
         {
-            var requestDelivery = await _context.RequestDeliveries.FindAsync(id);
+            var requestDelivery = await _repository.GetRDOriginal(id);
             if (requestDelivery == null)
             {
                 return NotFound();
             }
 
-            _context.RequestDeliveries.Remove(requestDelivery);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool RequestDeliveryExists(int id)
-        {
-            return _context.RequestDeliveries.Any(e => e.IdRequest == id);
+            return await _repository.RemoveRD(requestDelivery);
         }
     }
 }

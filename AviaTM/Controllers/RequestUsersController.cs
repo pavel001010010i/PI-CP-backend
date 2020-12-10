@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AviaTM;
 using AviaTM.Models;
+using AviaTM.Interfaces;
 
 namespace AviaTM.Controllers
 {
@@ -14,99 +15,50 @@ namespace AviaTM.Controllers
     [ApiController]
     public class RequestUsersController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-
-        public RequestUsersController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
-
+        private readonly IRequestUserRepository _repository;
+        public RequestUsersController(IRequestUserRepository context) => _repository = context;
         // GET: api/RequestUsers
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<RequestUser>>> GetRequestUser()
+        public async Task<ActionResult<List<RequestUser>>> GetRequestUser()
         {
-            return await _context.RequestUser.ToListAsync();
+            return await _repository.GetRUsers();
         }
 
         // GET: api/RequestUsers/5
         [HttpGet("{id}")]
         public async Task<ActionResult<RequestUser>> GetRequestUser(string id)
         {
-            var requestUser = await _context.RequestUser.FindAsync(id);
-
+            var requestUser = await _repository.GetRequestUser(id);
             if (requestUser == null)
             {
                 return NotFound();
             }
-
             return requestUser;
         }
 
         // PUT: api/RequestUsers/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutRequestUser(string id, RequestUser requestUser)
+        public async Task<ActionResult<object>> PutRequestUser(string id, RequestUser requestUser)
         {
-            if (id != requestUser.Login)
+            var planeEx = await _repository.GetRequestUser(requestUser.Login);
+            if (planeEx == null)
             {
                 return BadRequest();
             }
-
-            _context.Entry(requestUser).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!RequestUserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return await _repository.UpdateRUser(requestUser);
         }
 
         // POST: api/RequestUsers
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<object>> PostRequestUser(RequestUser requestUser)
         {
-            User user = new User() { Login = requestUser.Login, Role = requestUser.Role, Password = requestUser.Password, LockoutEnable = false };
-            _context.User.Add(user);
-            await _context.SaveChangesAsync();
-            var ru = await _context.RequestUser.FindAsync(requestUser.Login);
-            _context.RequestUser.Remove(ru);
-            await _context.SaveChangesAsync();
+            await _repository.AddUser(requestUser);
+            await _repository.RemoveRU(requestUser);
             var response = new
             {
                 succes = true,
                 message = "Application form completed"
             };
-            return response;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (RequestUserExists(requestUser.Login))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
             return response;
         }
 
@@ -114,15 +66,13 @@ namespace AviaTM.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<object>> DeleteRequestUser(string id)
         {
-            var requestUser = await _context.RequestUser.FindAsync(id);
-            var userProv = await _context.Provider.FirstOrDefaultAsync(x => x.Email == id);
-            var userCust = await _context.Customers.FirstOrDefaultAsync(x=>x.Email == id);
+            var requestUser = await _repository.GetRequestUser(id);
+            var userProv = await _repository.GetProvider(id);
+            var userCust = await _repository.GetCustomer(id);
             if (userCust != null)
             {
-                _context.RequestUser.Remove(requestUser);
-                await _context.SaveChangesAsync();
-                _context.Customers.Remove(userCust);
-                await _context.SaveChangesAsync();
+                await _repository.RemoveRU(requestUser);
+                await _repository.RemoveCustomer(userCust);
                 var response = new
                 {
                     succes = false,
@@ -133,10 +83,8 @@ namespace AviaTM.Controllers
             }
             if (userProv != null)
             {
-                _context.RequestUser.Remove(requestUser);
-                await _context.SaveChangesAsync();
-                _context.Provider.Remove(userProv);
-                await _context.SaveChangesAsync();
+                await _repository.RemoveRU(requestUser);
+                await _repository.RemoveProvider(userProv);
                 var response = new
                 {
                     succes = false,
@@ -153,9 +101,5 @@ namespace AviaTM.Controllers
             return respons;
         }
 
-        private bool RequestUserExists(string id)
-        {
-            return _context.RequestUser.Any(e => e.Login == id);
-        }
     }
 }

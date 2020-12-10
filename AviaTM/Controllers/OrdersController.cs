@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using AviaTM;
 using AviaTM.Models;
 using Microsoft.AspNetCore.Authorization;
+using AviaTM.Interfaces;
 
 namespace AviaTM.Controllers
 {
@@ -15,87 +16,23 @@ namespace AviaTM.Controllers
     [ApiController]
     public class OrdersController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-
-        public OrdersController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly IOrderRepository _repository;
+        public OrdersController(IOrderRepository context) => _repository = context;
 
         [Authorize]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrder()
+        public async Task<ActionResult<List<Order>>> GetOrder()
         {
             if (User.IsInRole("admin"))
             {
-                return await _context.Order
-                    .Include(x => x.Customer)
-                    .Include(x => x.Provider)
-                    .Include(x => x.Cargo)
-                    .Include(x => x.Country)
-                    .Include(x => x.Plane).ToListAsync();
+                return await _repository.GetOrderAdmin();
             }
             if (User.IsInRole("provider"))
             {
-                return await _context.Order
-                      .Include(x => x.Customer)
-                      .Include(x => x.Provider).Where(x => x.Provider.Email == User.Identity.Name)
-                      .Include(x => x.Cargo)
-                      .Include(x => x.Country)
-                      .Include(x => x.Plane).ToListAsync();
+                return await _repository.GetOrderProvider(User);
 
             }
-            return await _context.Order
-                    .Include(x => x.Customer).Where(x => x.Customer.Email == User.Identity.Name)
-                    .Include(x => x.Provider)
-                    .Include(x => x.Cargo)
-                    .Include(x => x.Country)
-                    .Include(x => x.Plane).ToListAsync();
-        }
-
-        // GET: api/Orders/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Order>> GetOrder(int id)
-        {
-            var order = await _context.Order.FindAsync(id);
-
-            if (order == null)
-            {
-                return NotFound();
-            }
-
-            return order;
-        }
-
-        // PUT: api/Orders/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutOrder(int id, Order order)
-        {
-            if (id != order.OrderId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(order).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!OrderExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return await _repository.GetOrderCustomer(User);
         }
 
         [HttpPost("/addorder")]
@@ -104,7 +41,7 @@ namespace AviaTM.Controllers
             try
             {
                 var kek = delivery;
-                var plane = await _context.Plane.Where(x => x.IdProvider == delivery.ProviderId).ToListAsync();
+                var plane = await _repository.GetPlane(delivery);
                 Random rand = new Random(DateTime.Now.ToString().GetHashCode());
                 int index = rand.Next(0, plane.Count);
                 Order order = new Order()
@@ -120,12 +57,10 @@ namespace AviaTM.Controllers
                     Status = "confirmation",
                     CastDelivery = delivery.CastDelivery
                 };
-                _context.Order.Add(order);
-                await _context.SaveChangesAsync();
+                await _repository.AddOder(order);
 
-                var del = await _context.RequestDeliveries.FindAsync(delivery.IdRequest);
-                _context.RequestDeliveries.Remove(del);
-                await _context.SaveChangesAsync();
+                var del = await _repository.GetRD(delivery.IdRequest);
+                await _repository.RemoveRD(del);
                 var response = new
                 {
                     succes = true,
@@ -144,46 +79,35 @@ namespace AviaTM.Controllers
             }
            
         }
-        [HttpPost]
-        public async Task<ActionResult<Order>> PostOrder(Order order)
-        {
-            _context.Order.Add(order);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetOrder", new { id = order.OrderId }, order);
-        }
 
         [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult<object>> DeleteOrder(int id)
         {
-            var cust = _context.Customers.FirstOrDefault(x => x.Email == User.Identity.Name);
+            var cust = await _repository.GetCustomer(User);
             if (cust != null)
             {
-                var customer = _context.Order.Where(x => x.CustomerId == cust.Id);
+                var customer = await _repository.GetOrderWhere(cust.Id);
                 if (customer != null)
                 {
-                    var order = await _context.Order.FindAsync(id);
-                    _context.Order.Remove(order);
-                    await _context.SaveChangesAsync();
+                    var order = await _repository.GetOrder(id);
+                    await _repository.RemoveOrder(order);
                     var respons = new
                     {
                         succes = true,
                         message = "Order deleted!"
                     };
                     return respons;
-
                 }
             }
-            var prov = _context.Provider.FirstOrDefault(x => x.Email == User.Identity.Name);
+            var prov = await _repository.GetProvider(User);
             if (prov != null)
             {
-                var provider = _context.Order.Where(x => x.ProviderId == prov.ProviderId);
+                var provider = await _repository.GetOrderWhereP(prov.ProviderId);
                 if (provider != null)
                 {
-                    var order = await _context.Order.FindAsync(id);
-                    _context.Order.Remove(order);
-                    await _context.SaveChangesAsync();
+                    var order = await _repository.GetOrder(id);
+                    await _repository.RemoveOrder(order);
                     var respons = new
                     {
                         succes = true,
@@ -193,9 +117,8 @@ namespace AviaTM.Controllers
                 }
             }
             if (User.IsInRole("admin")){
-                var order = await _context.Order.FindAsync(id);
-                _context.Order.Remove(order);
-                await _context.SaveChangesAsync();
+                var order = await _repository.GetOrder(id);
+                await _repository.RemoveOrder(order);
                 var respons = new
                 {
                     succes = true,
@@ -209,11 +132,6 @@ namespace AviaTM.Controllers
                 message = "You can't delete it :("
             };
             return response;
-        }
-
-        private bool OrderExists(int id)
-        {
-            return _context.Order.Any(e => e.OrderId == id);
         }
     }
 }

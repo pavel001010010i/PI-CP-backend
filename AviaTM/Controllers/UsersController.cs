@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AviaTM;
 using AviaTM.Models;
+using AviaTM.Repository;
+using AviaTM.Interfaces;
 
 namespace AviaTM.Controllers
 {
@@ -14,119 +16,67 @@ namespace AviaTM.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private IUserRepository _repository;
 
-        public UsersController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        public UsersController(IUserRepository context) => _repository = context;
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUser()
+        public async Task<List<User>> GetUser()
         {
-            return await _context.User.ToListAsync();
+            return await _repository.GetUsers();
         }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(string id)
         {
-            var user = await _context.User.FindAsync(id);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return user;
+            return await _repository.GetUser(id);
         }
 
         // PUT: api/Users/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(string id, User user)
         {
-            if (id != user.Login)
+            var existingUser = await _repository.GetUser(user.Login);
+            if (existingUser == null)
             {
-                return BadRequest();
+                return BadRequest("User not updated");
             }
 
-            _context.Entry(user).State = EntityState.Modified;
+            await _repository.UpdateUser(user);
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return Ok("User updated");
         }
 
-        // POST: api/Users
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
-            _context.User.Add(user);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (UserExists(user.Login))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return CreatedAtAction("GetUser", new { id = user.Login }, user);
+            await _repository.AddUser(user);
+            return Ok("User added");
         }
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
-            var user = await _context.User.FindAsync(id);
+            var user =  await _repository.GetUser(id);
             if (user == null)
             {
                 return NotFound();
             }
-            var userProv = await _context.Provider.FirstOrDefaultAsync(x => x.Email.Contains(id));
-            var userCust = await _context.Customers.FirstOrDefaultAsync(x => x.Email.Contains(id));
+            var userProv = await _repository.GetProvider(id);
+            var userCust = await _repository.GetCustomers(id);
             if(userProv!=null)
             {
-                _context.Provider.Remove(userProv);
-                await _context.SaveChangesAsync(); 
+                await _repository.RemoveProvider(userProv); 
             }
             if (userCust != null)
             {
-                _context.Customers.Remove(userCust);
-                await _context.SaveChangesAsync();
+                await _repository.RemoveCustomer(userCust);
             }
-            _context.User.Remove(user);
-            await _context.SaveChangesAsync();
+            await _repository.RemoveUser(user.Login);
             return NoContent();
-        }
-
-        private bool UserExists(string id)
-        {
-            return _context.User.Any(e => e.Login == id);
         }
     }
 }

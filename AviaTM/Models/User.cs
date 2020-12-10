@@ -44,4 +44,11 @@ namespace AviaTM.Models
         public string Password { get; set; }
 
     }
+
+    public class UserBody
+    {
+        public string Login { get; set; }
+        public string Password { get; set; }
+
+    }
 }

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using AviaTM;
 using AviaTM.Models;
 using Microsoft.AspNetCore.Authorization;
+using AviaTM.Interfaces;
 
 namespace AviaTM.Controllers
 {
@@ -15,31 +16,27 @@ namespace AviaTM.Controllers
     [ApiController]
     public class CountriesController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ICountryRepository _repository;
 
-        public CountriesController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        public CountriesController(ICountryRepository context) => _repository = context;
         [Authorize]
         [HttpGet("/getcountryval/{id}")]
         public async Task<ActionResult<object>> GetCountr(string id)
         {
-            Country country = await _context.Country.FirstOrDefaultAsync(x => x.NameCountry == id);
+            Country country = await _repository.GetCountry(id);
             var response = new
             {
                 Latitude = country.Latitude,
                 Longitude = country.Longitude
-                //  distance = country.Distance
             };
             return response;
         }
         // GET: api/Countries
         [Authorize]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Country>>> GetCountry()
+        public async Task<ActionResult<List<Country>>> GetCountry()
         {
-            return await _context.Country.ToListAsync();
+            return await _repository.GetCountries();
         }
 
         // GET: api/Countries/5
@@ -47,9 +44,8 @@ namespace AviaTM.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Country>> GetCountry(string id)
         {
-            var country = await _context.Country.FindAsync(id);
-
-            if (country == null)
+            var country = await _repository.GetCountry(id);
+            if(country == null)
             {
                 return NotFound();
             }
@@ -60,32 +56,15 @@ namespace AviaTM.Controllers
         // PUT: api/Countries/5
         [Authorize(Roles = "admin")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCountry(string id, Country country)
+        public async Task<ActionResult<object>> PutCountry(string id, Country country)
         {
-            if (id != country.NameCountry)
+            var existcountry = await _repository.GetCountry(country.NameCountry);
+
+            if (existcountry == null) 
             {
                 return BadRequest();
             }
-
-            _context.Entry(country).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CountryExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return await _repository.UpdateCountry(country);
         }
 
         // POST: api/Countries
@@ -102,57 +81,30 @@ namespace AviaTM.Controllers
                 };
                 return response;
             }
-            _context.Country.Add(country);
-            try
+            var countryEx = await _repository.GetCountry(country.NameCountry);
+            if (countryEx != null)
             {
-                await _context.SaveChangesAsync();
                 var response = new
                 {
-                    succes = true,
-                    message = "Country added"
+                    succes = false,
+                    message = "The country already exists"
                 };
                 return response;
             }
-            catch (DbUpdateException)
-            {
-                if (CountryExists(country.NameCountry))
-                {
-                    var response = new
-                    {
-                        succes = false,
-                        message = "Oops :("
-                    };
-                    return response;
-                    
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return CreatedAtAction("GetCountry", new { id = country.NameCountry }, country);
+            return await _repository.AddCountry(country);
         }
 
         // DELETE: api/Countries/5
         [Authorize(Roles = "admin")]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCountry(string id)
+        public async Task<ActionResult<object>> DeleteCountry(string id)
         {
-            var country = await _context.Country.FindAsync(id);
+            var country = await _repository.GetCountry(id);
             if (country == null)
             {
                 return NotFound();
             }
-            _context.Country.Remove(country);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool CountryExists(string id)
-        {
-            return _context.Country.Any(e => e.NameCountry == id);
+            return await _repository.RemoveCountry(country);
         }
     }
 }
