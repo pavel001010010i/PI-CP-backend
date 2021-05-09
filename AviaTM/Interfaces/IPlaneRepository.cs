@@ -1,4 +1,4 @@
-﻿using AviaTM.Models;
+﻿using AviaTM.Db.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,12 +9,12 @@ namespace AviaTM.Interfaces
 {
     public interface IPlaneRepository
     {
-        Task <List<Plane>> GetPlanesAdmin();
-        Task<List<Plane>> GetPlanesUser(ClaimsPrincipal User);
-        Task<Plane> GetPlane(int id);
-        Task<object> UpdatePlane(Plane plane);
-        Task<Provider> GetProvider(PlaneBody planeBody);
-        Task<object> AddPlane(Plane plane);
-        Task<object> RemovePlane(Plane plane);
+        //Task <List<Plane>> GetPlanesAdmin();
+        //Task<List<Plane>> GetPlanesUser(ClaimsPrincipal User);
+        //Task<Plane> GetPlane(int id);
+        //Task<object> UpdatePlane(Plane plane);
+        //Task<Provider> GetProvider(PlaneBody planeBody);
+        //Task<object> AddPlane(Plane plane);
+        //Task<object> RemovePlane(Plane plane);
     }
 }
