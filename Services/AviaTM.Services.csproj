@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AviaTM.DB.Model\AviaTM.DB.Model.csproj" />
+    <ProjectReference Include="..\AviaTM.Services.Model\AviaTM.Services.Models.csproj" />
+    <ProjectReference Include="..\Constant1\AviaTM.Constant.csproj" />
+  </ItemGroup>
+
+</Project>

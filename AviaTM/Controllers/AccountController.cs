@@ -1,202 +1,98 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using AviaTM.Models; // класс Person
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using AviaTM.Repository;
+using Microsoft.AspNetCore.Identity;
+using AviaTM.Services.Models.Infastructure;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using AviaTM.DB.Model.Models;
+using AviaTM.Services.Models.Models;
+using AviaTM.Services.IServicesController;
 
 namespace AviaTM.Controllers
 {
+    [Route("api/[controller]")]
     public class AccountController : ControllerBase
     {
-        private readonly  IAccountRepository _repository;
-        public AccountController(IAccountRepository context) => _repository = context;
-
-
-        [HttpPost("/token")]
-        public async Task<ActionResult<object>> Token([FromBody] UserBody user)
+        private readonly IAccountControllerService _context;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly SignInManager<AppUser> _signInManager;
+        private readonly UserContext _userContext;
+        public AccountController(IAccountControllerService context,
+            UserManager<AppUser> userManager,
+            SignInManager<AppUser> signInManager,
+            UserContext userContext)
         {
-            return _repository.GetToken(user);
+            _context = context;
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _userContext = userContext;
         }
 
-        [HttpPost("/addcustomer")]
-        public async Task<ActionResult<object>> AddCustomer([FromBody] CustomerBody userBody)
+        [HttpGet("get-user/{id}")]
+        public async Task<IActionResult> GetUserById(string id)
         {
-            var userT = await _repository.GetUser(userBody);
-            var userReques = await _repository.GetRequestUser(userBody);
-            var userCust = await _repository.GetCustomers(userBody);
-            var userProv = await _repository.GetProvider(userBody);
+
+            var user = await _context.FindUserById(id);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+            return Ok(user);
+        }
+        [HttpPost("registration-user")]
+        public async Task<IActionResult> RegistrationUser([FromBody] RegisterUserModel model)
+        {
             if (!ModelState.IsValid)
             {
-                var response = new
-                {
-                    exist = false,
-                    message = "Model not is valid"
-                };
-                return response;
+                return BadRequest(ModelState);
             }
-            if (User.IsInRole("admin"))
+
+            var responseMessage = await _context.RegistrationUser(model);
+
+            if (!responseMessage.Status)
             {
-                if (userT == null && userCust == null && userProv == null && userReques==null)
-                {
-                    User user = new User() { Login = userBody.Email, Password = userBody.Password, Role = "customer", LockoutEnable = true };
-                    Customer customer = new Customer()
-                    {
-                        FirstName = userBody.FirstName,
-                        LastName = userBody.LastName,
-                        Email = userBody.Email,
-                        Age = userBody.Age,
-                        PassportData = userBody.PassportData,
-                        Sex = userBody.Sex
-                    };
-
-                    await _repository.AddCustomer(customer);
-                    await _repository.AddUser(user);
-                    var response = new
-                    {
-                        exist = true,
-                        message = "User added successfully"
-                    };
-                    return response;
-                }
-                else
-                {
-                    var response = new
-                    {
-                        exist = false,
-                        message = "The application with the given usernames or the user already exists"
-                    };
-                    return response;
-                }
+                return BadRequest(responseMessage);
             }
-            else
-            {
-                if (userT == null && userCust == null && userProv == null && userReques == null)
-                {
-                    RequestUser ru = new RequestUser { Login = userBody.Email, Password = userBody.Password, Role = "customer"};
-                    Customer customer = new Customer()
-                    {
-                        FirstName = userBody.FirstName,
-                        LastName = userBody.LastName,
-                        Email = userBody.Email,
-                        Age = userBody.Age,
-                        PassportData = userBody.PassportData,
-                        Sex = userBody.Sex
-                    };
 
-                    await _repository.AddCustomer(customer);
-                    await _repository.AddRequestUser(ru);
-                    var response = new
-                    {
-                        exist = true,
-                        message = "Your request has been sent. Wait for admin approval"
-                    };
-                    return response;
-                }
-                else
-                {
-                    var response = new
-                    {
-                        exist = false,
-                        message = "The application with the given usernames or the user already exists"
-                    };
-                    return response;
-                }
-
-            }
-            
+            return Ok(responseMessage);
         }
-        [HttpPost("/addprovider")]
-        public async Task<ActionResult<object>> AddProvider([FromBody] ProviderBody providerBody)
+
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] UserBody model)
         {
-            var userT = await _repository.GetUserP(providerBody);
-            var userReques = await _repository.GetRequestUserP(providerBody);
-            var userCust = await _repository.GetCustomersP(providerBody);
-            var userProv = await _repository.GetProviderP(providerBody);
             if (!ModelState.IsValid)
             {
-                var response = new
-                {
-                    exist = false,
-                    message = "Model not is valid"
-                };
-                return response;
+                return BadRequest(ModelState);
             }
-            if (User.IsInRole("admin"))
-            {
-                if (userT == null && userCust == null && userProv == null && userReques==null)
-                {
-                    User user = new User() { Login = providerBody.Email, Password = providerBody.Password, Role = "provider", LockoutEnable = true };
-                    Provider provider = new Provider()
-                    {
-                        NameCompany = providerBody.NameCompany,
-                        LicenceNumber = providerBody.LicenceNumber,
-                        Email = providerBody.Email,
-                        PhoneNumber = providerBody.PhoneNumber,
-                        CountresProvider = providerBody.CountresProvider
-                    };
 
-                    await _repository.AddProvider(provider);
-                    await _repository.AddUser(user);
-                    var response = new
-                    {
-                        exist = true,
-                        message = "User added successfully"
-                    };
-                    return response;
-                }
-                else
-                {
-                    var response = new
-                    {
-                        exist = false,
-                        message = "The application with the given usernames or the user already exists"
-                    };
-                    return response;
-                }
-            }
-            else
+            var checkedUser = await _context.FindUser(model.Login);
+            if (checkedUser == null) 
             {
-                if (userT == null && userCust == null && userProv == null && userReques == null)
-                {
-                    RequestUser ru = new RequestUser { Login = providerBody.Email, Password = providerBody.Password, Role = "provider" };
-                    Provider provider = new Provider()
-                    {
-                        NameCompany = providerBody.NameCompany,
-                        LicenceNumber = providerBody.LicenceNumber,
-                        Email = providerBody.Email,
-                        PhoneNumber = providerBody.PhoneNumber,
-                        CountresProvider = providerBody.CountresProvider
-                    };
-
-                    await _repository.AddProvider(provider);
-                    await _repository.AddRequestUser(ru);
-                    var response = new
-                    {
-                        exist = true,
-                        message = "User added successfully"
-                    };
-                    return response;
-                }
-                else
-                {
-                    var response = new
-                    {
-                        exist = false,
-                        message = "The application with the given usernames or the user already exists"
-                    };
-                    return response;
-                }
+                return BadRequest();
             }
-            
+
+            if (checkedUser.isLockdown)
+            {
+                return BadRequest(new ResponseMessageModel
+                {
+                    Status=false,
+                    Message="Упс... Вы заблокированы :("
+                });
+            }
+
+            bool isPasswordValid = await _context.IsPasswordValid(checkedUser, model.Password);
+            if (!isPasswordValid)
+            {
+                return BadRequest();
+            }
+            string token = await _context.GenerateToken(checkedUser);
+
+            return Ok(token);
+           
         }
 
-
+        
         
     }
 }

@@ -17,16 +17,99 @@ namespace AviaTM.Migrations
             modelBuilder
                 .UseIdentityByDefaultColumns()
                 .HasAnnotation("Relational:MaxIdentifierLength", 63)
-                .HasAnnotation("ProductVersion", "5.0.0");
+                .HasAnnotation("ProductVersion", "5.0.4");
 
-            modelBuilder.Entity("AviaTM.Models.Cargo", b =>
+            modelBuilder.Entity("AviaTM.DB.Model.Models.AppUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("text");
+
+                    b.Property<string>("AnotherContact")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("NameOrganization")
+                        .HasColumnType("text");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("UNP")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<bool>("isLockdown")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex");
+
+                    b.ToTable("AspNetUsers");
+                });
+
+            modelBuilder.Entity("AviaTM.DB.Model.Models.Cargo", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .UseIdentityByDefaultColumn();
 
-                    b.Property<int>("CustomerId")
+                    b.Property<int>("CostDelivery")
                         .HasColumnType("integer");
 
                     b.Property<int>("Depth")
@@ -34,6 +117,18 @@ namespace AviaTM.Migrations
 
                     b.Property<int>("Height")
                         .HasColumnType("integer");
+
+                    b.Property<int>("IdRouteMap")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("IdTypeCurrency")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("IdTypePayment")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("IdUser")
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -45,192 +140,385 @@ namespace AviaTM.Migrations
                     b.Property<int>("Width")
                         .HasColumnType("integer");
 
+                    b.Property<bool>("isStatus")
+                        .HasColumnType("boolean");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
+                    b.HasIndex("IdRouteMap");
+
+                    b.HasIndex("IdTypeCurrency");
+
+                    b.HasIndex("IdTypePayment");
+
+                    b.HasIndex("IdUser");
 
                     b.ToTable("Cargos");
                 });
 
-            modelBuilder.Entity("AviaTM.Models.Country", b =>
-                {
-                    b.Property<string>("NameCountry")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Index")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("Latitude")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Longitude")
-                        .HasColumnType("integer");
-
-                    b.HasKey("NameCountry");
-
-                    b.ToTable("Countries");
-                });
-
-            modelBuilder.Entity("AviaTM.Models.Customer", b =>
+            modelBuilder.Entity("AviaTM.DB.Model.Models.InfoTransfer", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .UseIdentityByDefaultColumn();
 
-                    b.Property<int>("Age")
+                    b.Property<int>("IdCargo")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Email")
-                        .HasColumnType("text");
+                    b.Property<int>("IdRoute")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PassportData")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Sex")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("IdTransport")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Customers");
+                    b.HasIndex("IdCargo");
+
+                    b.HasIndex("IdRoute");
+
+                    b.HasIndex("IdTransport");
+
+                    b.ToTable("InfoTransfer");
                 });
 
-            modelBuilder.Entity("AviaTM.Models.Order", b =>
-                {
-                    b.Property<int>("OrderId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .UseIdentityByDefaultColumn();
-
-                    b.Property<int>("CargoId")
-                        .HasColumnType("integer");
-
-                    b.Property<double>("CastDelivery")
-                        .HasColumnType("double precision");
-
-                    b.Property<string>("CountryIdFrom")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("CountryIdTo")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("DateDelivery")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<DateTime>("DateDeparture")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<int>("PlaneId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ProviderId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("text");
-
-                    b.HasKey("OrderId");
-
-                    b.HasIndex("CargoId");
-
-                    b.HasIndex("CountryIdFrom");
-
-                    b.HasIndex("CountryIdTo");
-
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("PlaneId");
-
-                    b.HasIndex("ProviderId");
-
-                    b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("AviaTM.Models.Plane", b =>
+            modelBuilder.Entity("AviaTM.DB.Model.Models.OrderData", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .UseIdentityByDefaultColumn();
 
-                    b.Property<int>("CapacityWeight")
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("IdInfoTransfer")
                         .HasColumnType("integer");
+
+                    b.Property<int>("IdOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("IdTypeUser")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("IdUser")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdInfoTransfer");
+
+                    b.HasIndex("IdOrder");
+
+                    b.HasIndex("IdTypeUser");
+
+                    b.HasIndex("IdUser");
+
+                    b.ToTable("OrderData");
+                });
+
+            modelBuilder.Entity("AviaTM.DB.Model.Models.OrderMain", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OrderMains");
+                });
+
+            modelBuilder.Entity("AviaTM.DB.Model.Models.RouteMap", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("CityFrom")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CityTo")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CountryCodeFrom")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CountryCodeTo")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CountyFrom")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CountyTo")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("FullAddressFrom")
+                        .HasColumnType("text");
+
+                    b.Property<string>("FullAddressTo")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PostCodeFrom")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PostCodeTo")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("StateFrom")
+                        .HasColumnType("text");
+
+                    b.Property<string>("StateTo")
+                        .HasColumnType("text");
+
+                    b.Property<string>("StreetFrom")
+                        .HasColumnType("text");
+
+                    b.Property<string>("StreetTo")
+                        .HasColumnType("text");
+
+                    b.Property<float>("latFrom")
+                        .HasColumnType("real");
+
+                    b.Property<float>("latTo")
+                        .HasColumnType("real");
+
+                    b.Property<float>("lngFrom")
+                        .HasColumnType("real");
+
+                    b.Property<float>("lngTo")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RouteMaps");
+                });
+
+            modelBuilder.Entity("AviaTM.DB.Model.Models.Transport", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<int>("Depth")
+                        .HasColumnType("integer");
+
+                    b.Property<double>("FuelConsumption")
+                        .HasColumnType("double precision");
 
                     b.Property<int>("Height")
                         .HasColumnType("integer");
 
-                    b.Property<int>("IdProvider")
+                    b.Property<int>("IdRouteMap")
                         .HasColumnType("integer");
 
-                    b.Property<string>("ModelPlane")
+                    b.Property<int>("IdTransLoadCapacity")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("IdTypeTransport")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("IdUser")
                         .HasColumnType("text");
 
-                    b.Property<string>("NamePlane")
-                        .HasColumnType("text");
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("MaxLoadCapacity")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("NumberAxes")
+                        .HasColumnType("integer");
 
                     b.Property<int>("Width")
                         .HasColumnType("integer");
 
-                    b.Property<int>("depth")
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdRouteMap");
+
+                    b.HasIndex("IdTransLoadCapacity");
+
+                    b.HasIndex("IdTypeTransport");
+
+                    b.HasIndex("IdUser");
+
+                    b.ToTable("Transports");
+                });
+
+            modelBuilder.Entity("AviaTM.DB.Model.Models.TransportLoadCapacity", b =>
+                {
+                    b.Property<int>("Id")
                         .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("MaxValue")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MinValue")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdProvider");
-
-                    b.ToTable("Planes");
+                    b.ToTable("TransportLoadCapacity");
                 });
 
-            modelBuilder.Entity("AviaTM.Models.Provider", b =>
+            modelBuilder.Entity("AviaTM.DB.Model.Models.TypeCargo", b =>
                 {
-                    b.Property<int>("ProviderId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .UseIdentityByDefaultColumn();
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("CountresProvider")
-                        .IsRequired()
+                    b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<string>("Email")
+                    b.Property<string>("Name")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<bool>("isActive")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TypeCargoes");
+                });
+
+            modelBuilder.Entity("AviaTM.DB.Model.Models.TypeCurrency", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("isActive")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TypeCurrency");
+                });
+
+            modelBuilder.Entity("AviaTM.DB.Model.Models.TypePayment", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("isActive")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TypePayment");
+                });
+
+            modelBuilder.Entity("AviaTM.DB.Model.Models.TypeTransport", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<bool>("isActive")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TypeTransports");
+                });
+
+            modelBuilder.Entity("AviaTM.DB.Model.Models.TypeUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
                         .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<bool>("isActive")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TypeUsers");
+                });
+
+            modelBuilder.Entity("AviaTM.Db.Models.RegisterViewModel", b =>
+                {
+                    b.Property<string>("Login")
                         .HasMaxLength(40)
                         .HasColumnType("character varying(40)");
 
-                    b.Property<string>("LicenceNumber")
+                    b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("NameCompany")
+                    b.Property<string>("PasswordConfirm")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("PhoneNumber")
+                    b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("ProviderId");
+                    b.HasKey("Login");
 
-                    b.ToTable("Providers");
+                    b.ToTable("Registers");
                 });
 
-            modelBuilder.Entity("AviaTM.Models.RequestDelivery", b =>
+            modelBuilder.Entity("AviaTM.Db.Models.RequestDelivery", b =>
                 {
                     b.Property<int>("IdRequest")
                         .ValueGeneratedOnAdd()
@@ -269,170 +557,415 @@ namespace AviaTM.Migrations
 
                     b.HasIndex("CargoId");
 
-                    b.HasIndex("CountryIdFrom");
-
-                    b.HasIndex("CountryIdTo");
-
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("ProviderId");
-
                     b.ToTable("RequestDeliveries");
                 });
 
-            modelBuilder.Entity("AviaTM.Models.RequestUser", b =>
+            modelBuilder.Entity("CargoTypeCargo", b =>
                 {
-                    b.Property<string>("Login")
-                        .HasMaxLength(40)
-                        .HasColumnType("character varying(40)");
+                    b.Property<int>("CargosId")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("TypeCargoId")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.HasKey("CargosId", "TypeCargoId");
 
-                    b.HasKey("Login");
+                    b.HasIndex("TypeCargoId");
 
-                    b.ToTable("RequestUser");
+                    b.ToTable("CargoTypeCargo");
                 });
 
-            modelBuilder.Entity("AviaTM.Models.User", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
-                    b.Property<string>("Login")
-                        .HasMaxLength(40)
-                        .HasColumnType("character varying(40)");
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
 
-                    b.Property<bool>("LockoutEnable")
-                        .HasColumnType("boolean");
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("text");
 
-                    b.Property<string>("Password")
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex");
+
+                    b.ToTable("AspNetRoles");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RoleId")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Role")
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Login");
+                    b.HasKey("Id");
 
-                    b.ToTable("User");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims");
                 });
 
-            modelBuilder.Entity("AviaTM.Models.Cargo", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("AviaTM.Models.Customer", "Customer")
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("text");
 
-                    b.Navigation("Customer");
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins");
                 });
 
-            modelBuilder.Entity("AviaTM.Models.Order", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.HasOne("AviaTM.Models.Cargo", "Cargo")
-                        .WithMany()
-                        .HasForeignKey("CargoId")
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("text");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("text");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens");
+                });
+
+            modelBuilder.Entity("TypeCargoTypeTransport", b =>
+                {
+                    b.Property<int>("TypeCargosId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TypeTransportsId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("TypeCargosId", "TypeTransportsId");
+
+                    b.HasIndex("TypeTransportsId");
+
+                    b.ToTable("TypeCargoTypeTransport");
+                });
+
+            modelBuilder.Entity("AviaTM.DB.Model.Models.Cargo", b =>
+                {
+                    b.HasOne("AviaTM.DB.Model.Models.RouteMap", "RouteMap")
+                        .WithMany("Cargos")
+                        .HasForeignKey("IdRouteMap")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AviaTM.Models.Country", "Country2")
-                        .WithMany()
-                        .HasForeignKey("CountryIdFrom")
+                    b.HasOne("AviaTM.DB.Model.Models.TypeCurrency", "TypeCurrency")
+                        .WithMany("Cargos")
+                        .HasForeignKey("IdTypeCurrency")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AviaTM.Models.Country", "Country")
-                        .WithMany()
-                        .HasForeignKey("CountryIdTo")
+                    b.HasOne("AviaTM.DB.Model.Models.TypePayment", "TypePayment")
+                        .WithMany("Cargos")
+                        .HasForeignKey("IdTypePayment")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AviaTM.Models.Customer", "Customer")
+                    b.HasOne("AviaTM.DB.Model.Models.AppUser", "AppUser")
                         .WithMany()
-                        .HasForeignKey("CustomerId")
+                        .HasForeignKey("IdUser");
+
+                    b.Navigation("AppUser");
+
+                    b.Navigation("RouteMap");
+
+                    b.Navigation("TypeCurrency");
+
+                    b.Navigation("TypePayment");
+                });
+
+            modelBuilder.Entity("AviaTM.DB.Model.Models.InfoTransfer", b =>
+                {
+                    b.HasOne("AviaTM.DB.Model.Models.Cargo", "Cargo")
+                        .WithMany()
+                        .HasForeignKey("IdCargo")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AviaTM.Models.Plane", "Plane")
+                    b.HasOne("AviaTM.DB.Model.Models.RouteMap", "RouteMap")
                         .WithMany()
-                        .HasForeignKey("PlaneId")
+                        .HasForeignKey("IdRoute")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AviaTM.Models.Provider", "Provider")
+                    b.HasOne("AviaTM.DB.Model.Models.Transport", "Transport")
                         .WithMany()
-                        .HasForeignKey("ProviderId")
+                        .HasForeignKey("IdTransport")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Cargo");
 
-                    b.Navigation("Country");
+                    b.Navigation("RouteMap");
 
-                    b.Navigation("Country2");
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Plane");
-
-                    b.Navigation("Provider");
+                    b.Navigation("Transport");
                 });
 
-            modelBuilder.Entity("AviaTM.Models.Plane", b =>
+            modelBuilder.Entity("AviaTM.DB.Model.Models.OrderData", b =>
                 {
-                    b.HasOne("AviaTM.Models.Provider", "Provider")
-                        .WithMany()
-                        .HasForeignKey("IdProvider")
+                    b.HasOne("AviaTM.DB.Model.Models.InfoTransfer", "InfoTransfer")
+                        .WithMany("OrderDatas")
+                        .HasForeignKey("IdInfoTransfer")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Provider");
+                    b.HasOne("AviaTM.DB.Model.Models.OrderMain", "Order")
+                        .WithMany("OrderDatas")
+                        .HasForeignKey("IdOrder")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AviaTM.DB.Model.Models.TypeUser", "TypeUser")
+                        .WithMany()
+                        .HasForeignKey("IdTypeUser")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AviaTM.DB.Model.Models.AppUser", "AppUser")
+                        .WithMany()
+                        .HasForeignKey("IdUser");
+
+                    b.Navigation("AppUser");
+
+                    b.Navigation("InfoTransfer");
+
+                    b.Navigation("Order");
+
+                    b.Navigation("TypeUser");
                 });
 
-            modelBuilder.Entity("AviaTM.Models.RequestDelivery", b =>
+            modelBuilder.Entity("AviaTM.DB.Model.Models.Transport", b =>
                 {
-                    b.HasOne("AviaTM.Models.Cargo", "Cargo")
+                    b.HasOne("AviaTM.DB.Model.Models.RouteMap", "RouteMap")
+                        .WithMany()
+                        .HasForeignKey("IdRouteMap")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AviaTM.DB.Model.Models.TransportLoadCapacity", "TransportLoadCapacity")
+                        .WithMany("Transports")
+                        .HasForeignKey("IdTransLoadCapacity")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AviaTM.DB.Model.Models.TypeTransport", "TypeTransport")
+                        .WithMany()
+                        .HasForeignKey("IdTypeTransport")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AviaTM.DB.Model.Models.AppUser", "AppUser")
+                        .WithMany()
+                        .HasForeignKey("IdUser");
+
+                    b.Navigation("AppUser");
+
+                    b.Navigation("RouteMap");
+
+                    b.Navigation("TransportLoadCapacity");
+
+                    b.Navigation("TypeTransport");
+                });
+
+            modelBuilder.Entity("AviaTM.Db.Models.RequestDelivery", b =>
+                {
+                    b.HasOne("AviaTM.DB.Model.Models.Cargo", "Cargo")
                         .WithMany()
                         .HasForeignKey("CargoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AviaTM.Models.Country", "Country2")
-                        .WithMany()
-                        .HasForeignKey("CountryIdFrom")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AviaTM.Models.Country", "Country")
-                        .WithMany()
-                        .HasForeignKey("CountryIdTo");
-
-                    b.HasOne("AviaTM.Models.Customer", "Customer")
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AviaTM.Models.Provider", "Provider")
-                        .WithMany()
-                        .HasForeignKey("ProviderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Cargo");
+                });
 
-                    b.Navigation("Country");
+            modelBuilder.Entity("CargoTypeCargo", b =>
+                {
+                    b.HasOne("AviaTM.DB.Model.Models.Cargo", null)
+                        .WithMany()
+                        .HasForeignKey("CargosId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Country2");
+                    b.HasOne("AviaTM.DB.Model.Models.TypeCargo", null)
+                        .WithMany()
+                        .HasForeignKey("TypeCargoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
 
-                    b.Navigation("Customer");
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
 
-                    b.Navigation("Provider");
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.HasOne("AviaTM.DB.Model.Models.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.HasOne("AviaTM.DB.Model.Models.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AviaTM.DB.Model.Models.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.HasOne("AviaTM.DB.Model.Models.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TypeCargoTypeTransport", b =>
+                {
+                    b.HasOne("AviaTM.DB.Model.Models.TypeCargo", null)
+                        .WithMany()
+                        .HasForeignKey("TypeCargosId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AviaTM.DB.Model.Models.TypeTransport", null)
+                        .WithMany()
+                        .HasForeignKey("TypeTransportsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("AviaTM.DB.Model.Models.InfoTransfer", b =>
+                {
+                    b.Navigation("OrderDatas");
+                });
+
+            modelBuilder.Entity("AviaTM.DB.Model.Models.OrderMain", b =>
+                {
+                    b.Navigation("OrderDatas");
+                });
+
+            modelBuilder.Entity("AviaTM.DB.Model.Models.RouteMap", b =>
+                {
+                    b.Navigation("Cargos");
+                });
+
+            modelBuilder.Entity("AviaTM.DB.Model.Models.TransportLoadCapacity", b =>
+                {
+                    b.Navigation("Transports");
+                });
+
+            modelBuilder.Entity("AviaTM.DB.Model.Models.TypeCurrency", b =>
+                {
+                    b.Navigation("Cargos");
+                });
+
+            modelBuilder.Entity("AviaTM.DB.Model.Models.TypePayment", b =>
+                {
+                    b.Navigation("Cargos");
                 });
 #pragma warning restore 612, 618
         }
