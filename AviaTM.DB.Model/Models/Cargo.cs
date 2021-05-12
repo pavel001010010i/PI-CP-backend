@@ -1,7 +1,4 @@
-﻿using AviaTM.Db.Models;
-using AviaTM.DB.Model.Models;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -25,6 +22,7 @@ namespace AviaTM.DB.Model.Models
         public int Weight { get; set; }
         [Required]
         public int CostDelivery { get; set; }
+        public int? OrderDataId { get; set; }
 
         public bool isStatus { get; set; }
 

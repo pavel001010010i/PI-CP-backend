@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using AviaTM.Interfaces;
 using AviaTM.Services.IServicesController;
 using System.Threading.Tasks;
 using AviaTM.DB.Model.Models;

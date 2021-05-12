@@ -44,6 +44,18 @@ namespace AviaTM.Controllers
             return Ok();
         }
 
+        [HttpGet("get-cargo/{id}")]
+        [Authorize]
+        public async Task<IActionResult> GetCargoId(int id)
+        {
+            var cargo = await _context.GetCargoId(id);
+            if (cargo == null)
+            {
+                return BadRequest();
+            }
+            return Ok(cargo);
+        }
+
         [HttpGet("get-cargoes")]
         [Authorize]
         public async Task<IActionResult> GetCargo()
@@ -51,6 +63,15 @@ namespace AviaTM.Controllers
             var cargoes = await _context.GetCargos();
             return Ok(cargoes);
         }
+
+        [HttpGet("get-cargoes-request")]
+        [Authorize]
+        public async Task<IActionResult> GetCargoesForSelectRequest()
+        {
+            var cargoes = await _context.GetCargoesForSelectRequest();
+            return Ok(cargoes);
+        }
+
         [HttpPut("update-cargo")]
         [Authorize]
         public async Task<IActionResult> UpdateCargo([FromBody] RouteModel model)

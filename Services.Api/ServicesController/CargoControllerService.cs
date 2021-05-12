@@ -74,22 +74,40 @@ namespace AviaTm.Services.Api.ServicesController
 
         public async Task<IEnumerable<Cargo>> GetCargos()
         {
-            var cargoes = _context.Cargoes.Where(x => x.IdUser.Contains(_userContext.UserId)).OrderByDescending(x=>x.Id)
-                .Select(x=> new Cargo
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Width = x.Width,
-                    Height = x.Height,
-                    Depth = x.Depth,
-                    Weight = x.Weight,
-                    isStatus = x.isStatus,
-                    TypeCargo = x.TypeCargo,
-                    IdTypePayment = x.IdTypePayment,
-                    IdTypeCurrency = x.IdTypeCurrency,
-                    CostDelivery = x.CostDelivery,
-                    IdRouteMap = x.IdRouteMap
-                });
+            var cargoes = _context.Cargoes
+                
+                .Include(x => x.TypeCurrency)
+                .Include(x => x.TypePayment)
+                .Include(x=>x.TypeCargo)
+                .Include(x => x.RouteMap).Where(x => x.IdUser.Contains(_userContext.UserId)).OrderByDescending(x => x.Id)
+                .AsNoTracking();
+                //.Select(x=> new Cargo
+                //{
+                //    Id = x.Id,
+                //    Name = x.Name,
+                //    Width = x.Width,
+                //    Height = x.Height,
+                //    Depth = x.Depth,
+                //    Weight = x.Weight,
+                //    isStatus = x.isStatus,
+                   
+                //    IdTypePayment = x.IdTypePayment,
+                //    IdTypeCurrency = x.IdTypeCurrency,
+                //    CostDelivery = x.CostDelivery,
+                //    IdRouteMap = x.IdRouteMap,
+                //    IdUser = x.IdUser,
+                //    TypeCurrency = x.TypeCurrency,
+                //    TypePayment = x.TypePayment,
+                //    RouteMap = x.RouteMap,
+                //});
+            return cargoes;
+        }
+        public async Task<IEnumerable<Cargo>> GetCargoesForSelectRequest()
+        {
+            var cargoes = _context.Cargoes
+                .Where(x => x.IdUser.Contains(_userContext.UserId))
+                .OrderByDescending(x => x.Id)
+                .AsNoTracking();
             return cargoes;
         }
 
@@ -258,6 +276,11 @@ namespace AviaTm.Services.Api.ServicesController
                 cargoes = cargoes.Where(x => x.RouteMap.PostCodeTo.ToUpper().Contains(model.PostcodeTo.ToUpper()));
             }
             return await cargoes.Include(x=>x.TypeCargo).OrderByDescending(x => x.Id).ToListAsync();
+        }
+
+        public async Task<Cargo> GetCargoId(int id)
+        {
+            return await _context.Cargoes.FindAsync(id);
         }
     }
 }

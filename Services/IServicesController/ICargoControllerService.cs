@@ -8,6 +8,8 @@ namespace AviaTM.Services.IServicesController
     public interface ICargoControllerService
     {
         Task<IEnumerable<Cargo>> GetCargos();
+        Task<IEnumerable<Cargo>> GetCargoesForSelectRequest();
+        Task<Cargo> GetCargoId(int id);
         Task AddCargos(RouteModel model);
         Task DeleteCargo(int id);
         Task UpdateCargo(RouteModel model);

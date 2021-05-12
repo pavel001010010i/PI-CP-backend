@@ -160,7 +160,7 @@ namespace AviaTm.Services.Api.ServicesController
                 .Include(x=>x.TransportLoadCapacity)
                 .Include(x=>x.TypeTransport)
                 .Where(x=>x.IsActive)
-                .AsQueryable();
+                .AsQueryable().AsNoTracking();
 
             if (model == null)
             {

@@ -3,15 +3,17 @@ using System;
 using AviaTM;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AviaTM.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210511105539_AddRequestAndOrderEntity")]
+    partial class AddRequestAndOrderEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -134,9 +136,6 @@ namespace AviaTM.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("OrderDataId")
-                        .HasColumnType("integer");
-
                     b.Property<int>("Weight")
                         .HasColumnType("integer");
 
@@ -156,99 +155,7 @@ namespace AviaTM.Migrations
 
                     b.HasIndex("IdUser");
 
-                    b.HasIndex("OrderDataId");
-
                     b.ToTable("Cargos");
-                });
-
-            modelBuilder.Entity("AviaTM.DB.Model.Models.OrderData", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .UseIdentityByDefaultColumn();
-
-                    b.Property<string>("IdUser")
-                        .HasColumnType("text");
-
-                    b.Property<int?>("OrderMainId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("RequestMainId")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("Status")
-                        .HasColumnType("boolean");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IdUser");
-
-                    b.HasIndex("OrderMainId");
-
-                    b.HasIndex("RequestMainId");
-
-                    b.ToTable("OrderData");
-                });
-
-            modelBuilder.Entity("AviaTM.DB.Model.Models.OrderMain", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .UseIdentityByDefaultColumn();
-
-                    b.Property<int>("IdTransport")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("IdUser")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<bool>("Status")
-                        .HasColumnType("boolean");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IdTransport");
-
-                    b.HasIndex("IdUser");
-
-                    b.ToTable("OrderMain");
-                });
-
-            modelBuilder.Entity("AviaTM.DB.Model.Models.RequestMain", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .UseIdentityByDefaultColumn();
-
-                    b.Property<int>("IdTransport")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("IdUser")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<bool>("Status")
-                        .HasColumnType("boolean");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IdTransport");
-
-                    b.HasIndex("IdUser");
-
-                    b.ToTable("RequestMain");
                 });
 
             modelBuilder.Entity("AviaTM.DB.Model.Models.RouteMap", b =>
@@ -668,10 +575,6 @@ namespace AviaTM.Migrations
                         .WithMany()
                         .HasForeignKey("IdUser");
 
-                    b.HasOne("AviaTM.DB.Model.Models.OrderData", null)
-                        .WithMany("Cargoes")
-                        .HasForeignKey("OrderDataId");
-
                     b.Navigation("AppUser");
 
                     b.Navigation("RouteMap");
@@ -679,57 +582,6 @@ namespace AviaTM.Migrations
                     b.Navigation("TypeCurrency");
 
                     b.Navigation("TypePayment");
-                });
-
-            modelBuilder.Entity("AviaTM.DB.Model.Models.OrderData", b =>
-                {
-                    b.HasOne("AviaTM.DB.Model.Models.AppUser", "User")
-                        .WithMany()
-                        .HasForeignKey("IdUser");
-
-                    b.HasOne("AviaTM.DB.Model.Models.OrderMain", null)
-                        .WithMany("OrderDats")
-                        .HasForeignKey("OrderMainId");
-
-                    b.HasOne("AviaTM.DB.Model.Models.RequestMain", null)
-                        .WithMany("OrderDats")
-                        .HasForeignKey("RequestMainId");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("AviaTM.DB.Model.Models.OrderMain", b =>
-                {
-                    b.HasOne("AviaTM.DB.Model.Models.Transport", "Transport")
-                        .WithMany()
-                        .HasForeignKey("IdTransport")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AviaTM.DB.Model.Models.AppUser", "User")
-                        .WithMany()
-                        .HasForeignKey("IdUser");
-
-                    b.Navigation("Transport");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("AviaTM.DB.Model.Models.RequestMain", b =>
-                {
-                    b.HasOne("AviaTM.DB.Model.Models.Transport", "Transport")
-                        .WithMany()
-                        .HasForeignKey("IdTransport")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AviaTM.DB.Model.Models.AppUser", "User")
-                        .WithMany()
-                        .HasForeignKey("IdUser");
-
-                    b.Navigation("Transport");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("AviaTM.DB.Model.Models.Transport", b =>
@@ -844,21 +696,6 @@ namespace AviaTM.Migrations
                         .HasForeignKey("TypeTransportsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("AviaTM.DB.Model.Models.OrderData", b =>
-                {
-                    b.Navigation("Cargoes");
-                });
-
-            modelBuilder.Entity("AviaTM.DB.Model.Models.OrderMain", b =>
-                {
-                    b.Navigation("OrderDats");
-                });
-
-            modelBuilder.Entity("AviaTM.DB.Model.Models.RequestMain", b =>
-                {
-                    b.Navigation("OrderDats");
                 });
 
             modelBuilder.Entity("AviaTM.DB.Model.Models.RouteMap", b =>

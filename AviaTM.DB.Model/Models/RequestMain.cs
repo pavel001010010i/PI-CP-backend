@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace AviaTM.DB.Model.Models
 {
-    public class OrderMain
+    public class RequestMain
     {
         public int Id { get; set; }
         public int IdTransport { get; set; }
@@ -21,6 +19,7 @@ namespace AviaTM.DB.Model.Models
 
         [ForeignKey("IdTransport")]
         public virtual Transport Transport { get; set; }
+
         [ForeignKey("IdUser")]
         public virtual AppUser User { get; set; }
         public virtual ICollection<OrderData> OrderDats{ get; set; }
