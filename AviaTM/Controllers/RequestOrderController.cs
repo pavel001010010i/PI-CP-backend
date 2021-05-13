@@ -82,11 +82,51 @@ namespace AviaTM.Controllers
             return Ok(requests);
         }
 
-        [HttpPost("delete-item")]
+        [HttpGet("get-orders-providers")]
+        [Authorize]
+        public IActionResult GetOrderProvoders()
+        {
+            var requests = _context.GetOrdersUserProvider(_userContext.UserId);
+            return Ok(requests);
+        }
+
+        [HttpGet("get-orders-customers")]
+        [Authorize]
+        public IActionResult GetOrderCustomers()
+        {
+            var requests = _context.GetOrdersUserCustomer(_userContext.UserId);
+            return Ok(requests);
+        }
+
+        [HttpPost("delete-item-request-cust")]
         [Authorize]
         public async Task<IActionResult> DeleteRequestCustomer([FromBody] RequestMain model)
         {
             var response = await _context.DeleteRequestCustomer(model);
+            return Ok(response);
+        }
+
+        [HttpPost("delete-item-request-prov")]
+        [Authorize]
+        public async Task<IActionResult> DeleteRequestProvider([FromBody] RequestMain model)
+        {
+            var response = await _context.DeleteRequestProvider(model);
+            return Ok(response);
+        }
+
+        [HttpPost("accept-item-request")]
+        [Authorize]
+        public async Task<IActionResult> AcceptItemRequest([FromBody] RequestMain model)
+        {
+            var response = await _context.AcceptItemRequest(model);
+            return Ok(response);
+        }
+
+        [HttpPost("done-item-order")]
+        [Authorize]
+        public async Task<IActionResult> DoneItemOrder([FromBody] RequestMain model)
+        {
+            var response = await _context.DoneItemOrder(model);
             return Ok(response);
         }
 

@@ -14,8 +14,15 @@ namespace AviaTM.Services.IServicesController
         Task<ResponseMessageModel> Add(RequestModel model);
         Task Update(RequestModel model);
 
+        IEnumerable<RequestMain> GetOrdersUserCustomer(string idUser);
+        IEnumerable<RequestMain> GetOrdersUserProvider(string idUser);
+
 
         Task<ResponseMessageModel> DeleteRequestCustomer(RequestMain model);
+        Task<ResponseMessageModel> DeleteRequestProvider(RequestMain model);
+        Task<ResponseMessageModel> AcceptItemRequest(RequestMain model);
+        Task<ResponseMessageModel> DoneItemOrder(RequestMain model);
+
 
     }
 }
