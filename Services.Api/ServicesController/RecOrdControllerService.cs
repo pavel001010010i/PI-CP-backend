@@ -114,6 +114,8 @@ namespace AviaTm.Services.Api.ServicesController
                         Model = x.Transport.Model,
                         RouteMap = new RouteMap
                         {
+                            CountryCodeFrom = x.Transport.RouteMap.CountryCodeFrom,
+                            CountryCodeTo = x.Transport.RouteMap.CountryCodeTo,
                             FullAddressFrom = x.Transport.RouteMap.FullAddressFrom,
                             FullAddressTo = x.Transport.RouteMap.FullAddressTo,
                             EndDate = x.Transport.RouteMap.EndDate,
@@ -122,8 +124,12 @@ namespace AviaTm.Services.Api.ServicesController
                         Height = x.Transport.Height,
                         Width = x.Transport.Width,
                         Depth = x.Transport.Depth,
-                        MaxLoadCapacity = x.Transport.MaxLoadCapacity
-                        
+                        MaxLoadCapacity = x.Transport.MaxLoadCapacity,
+                        AppUser = x.Transport.AppUser,
+                        FuelConsumption = x.Transport.FuelConsumption,
+                        TypeTransport = x.Transport.TypeTransport,
+                        TransportLoadCapacity = x.Transport.TransportLoadCapacity
+
                     },
                     OrderDats = x.OrderDats.Where(x=>x.IdUser.Contains(idUser)).Select(x => new OrderData
                     {
