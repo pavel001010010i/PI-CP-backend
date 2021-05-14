@@ -1,7 +1,4 @@
-﻿using AviaTM.Db.Models;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
@@ -11,27 +8,21 @@ namespace AviaTM.DB.Model.Models
     {
 
         public int Id { get; set; }
-        public int IdOrder{ get; set; }
+        public int? RequestMainId { get; set; }
+        public int? OrderMainId { get; set; }
+
         public string IdUser{ get; set; }
-        public int IdInfoTransfer { get; set; }
-        public int IdTypeUser { get; set; }
 
-        //[Required]
-        public DateTime Date { get; set; }
-
-        //[Required]
         public bool Status { get; set; }
+        [ForeignKey("RequestMainId")]
+        public virtual RequestMain RequestMain{ get; set; }
+        [ForeignKey("OrderMainId")]
+        public virtual OrderMain OrderMain { get; set; }
+
         [ForeignKey("IdUser")]
-        public  AppUser AppUser { get; set; }
+        public virtual AppUser User { get; set; }
+        public virtual ICollection<Cargo> Cargoes { get; set; }
 
-        [ForeignKey("IdOrder")]
-        public  OrderMain Order{ get; set; }
-
-        [ForeignKey("IdInfoTransfer")]
-        public InfoTransfer InfoTransfer { get; set; }
-
-        [ForeignKey("IdTypeUser")]
-        public TypeUser TypeUser{ get; set; }
 
     }
 }

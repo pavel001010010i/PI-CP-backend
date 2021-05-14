@@ -13,7 +13,7 @@ namespace AviaTM.Services.IServicesController
     {
         Task<IEnumerable<Transport>> GetTransports();
         Task AddTransport(RouteModel model);
-        Task DeleteTransport(int id);
+        Task<ResponseMessageModel> DeleteTransport(int id);
         Task UpdateTransport(RouteModel model);
         Task<IEnumerable<Transport>> SearchTransport(SearchtModel model);
     }

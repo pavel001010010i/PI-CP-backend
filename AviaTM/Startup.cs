@@ -1,4 +1,3 @@
-using AviaTM.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -70,7 +69,7 @@ namespace AviaTM
             }
             app.UseStaticFiles();
             
-            app.UseRouting();
+            app.UseRouting();   
 
             app.UseCors(options => options
             .SetIsOriginAllowed(_ => true)
@@ -127,6 +126,7 @@ namespace AviaTM
         private static void RegisterDependencies(IServiceCollection services)
         {
             services.AddScoped<UserContext>();
+            services.AddScoped<IRecOrdControllerService, RecOrdControllerService>();
             services.AddScoped<IUserControllerService, UserControllerService>();
             services.AddScoped<ITypePaymentControllerService, TypePaymentControllerService>();
             services.AddScoped<ITypeCurrencyControllerService, TypeCurrencyControllerService>();

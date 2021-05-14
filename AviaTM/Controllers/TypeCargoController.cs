@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using AviaTM;
-using AviaTM.Db.Models;
 using Microsoft.AspNetCore.Authorization;
-using AviaTM.Interfaces;
 using AviaTM.Services.IServicesController;
 using AviaTM.DB.Model.Models;
 using AviaTM.Services.Models.Infastructure;
