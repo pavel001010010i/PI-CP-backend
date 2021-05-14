@@ -155,7 +155,7 @@ namespace AviaTm.Services.Api.ServicesController
                         
                     }).ToList(),
                    
-                }).AsNoTracking();              
+                });              
         }
 
         public IEnumerable<RequestMain> GetRequestsUserProvider(string idUser)
@@ -215,7 +215,7 @@ namespace AviaTm.Services.Api.ServicesController
 
                      }).ToList(),
 
-                 }).AsNoTracking();
+                 });
         }
 
         public IEnumerable<RequestMain> GetOrdersUserCustomer(string idUser)
@@ -228,11 +228,12 @@ namespace AviaTm.Services.Api.ServicesController
                     IdTransport = x.IdTransport,
                     Transport = new Transport
                     {
-
                         Name = x.Transport.Name,
                         Model = x.Transport.Model,
                         RouteMap = new RouteMap
                         {
+                            CountryCodeFrom = x.Transport.RouteMap.CountryCodeFrom,
+                            CountryCodeTo = x.Transport.RouteMap.CountryCodeTo,
                             FullAddressFrom = x.Transport.RouteMap.FullAddressFrom,
                             FullAddressTo = x.Transport.RouteMap.FullAddressTo,
                             EndDate = x.Transport.RouteMap.EndDate,
@@ -241,8 +242,11 @@ namespace AviaTm.Services.Api.ServicesController
                         Height = x.Transport.Height,
                         Width = x.Transport.Width,
                         Depth = x.Transport.Depth,
-                        MaxLoadCapacity = x.Transport.MaxLoadCapacity
-
+                        MaxLoadCapacity = x.Transport.MaxLoadCapacity,
+                        AppUser = x.Transport.AppUser,
+                        FuelConsumption = x.Transport.FuelConsumption,
+                        TypeTransport = x.Transport.TypeTransport,
+                        TransportLoadCapacity = x.Transport.TransportLoadCapacity
                     },
                     OrderDats = x.OrderDats.Where(x => x.IdUser.Contains(idUser)).Select(x => new OrderData
                     {
@@ -274,7 +278,7 @@ namespace AviaTm.Services.Api.ServicesController
 
                     }).ToList(),
 
-                }).AsNoTracking();
+                });
         }
 
         public IEnumerable<RequestMain> GetOrdersUserProvider(string idUser)
@@ -334,7 +338,130 @@ namespace AviaTm.Services.Api.ServicesController
 
                      }).ToList(),
 
-                 }).AsNoTracking();
+                 });
+        }
+
+
+        public async Task<ResponseMessageModel> DeleteOrderCustomer(RequestMain model)
+        {
+            try 
+            {
+                foreach (var cargoes in model.OrderDats.Select(x => x.Cargoes))
+                {
+                    foreach (var cargo in cargoes)
+                    {
+                        var car = new Cargo
+                        {
+                            Id = cargo.Id,
+                            Name = cargo.Name,
+                            RouteMap = cargo.RouteMap,
+                            CostDelivery = cargo.CostDelivery,
+                            Height = cargo.Height,
+                            Weight = cargo.Weight,
+                            Depth = cargo.Depth,
+                            Width = cargo.Width,
+                            isStatus = cargo.isStatus,
+                            IdTypeCurrency = cargo.IdTypeCurrency,
+                            IdTypePayment = cargo.IdTypePayment,
+                            OrderDataId = cargo.OrderDataId,
+                            IdUser = cargo.IdUser
+                        };
+                        _context.Cargoes.Attach(car);
+                        car.OrderDataId = null;
+                        _context.Cargoes.Update(car);
+                    }
+                }
+
+                var orderMainId = model.OrderDats.Select(x => x.OrderMainId).FirstOrDefault();
+                var ordersData = _context.OrderData.Where(x => x.OrderMainId == orderMainId && x.IdUser == _userContext.UserId);
+
+                _context.OrderData.RemoveRange(ordersData);
+                await _context.SaveChangesAsync();
+
+                var ordersDataForOrderIdExist = _context.OrderData.Where(x => x.OrderMainId == orderMainId).ToList();
+                if (!ordersDataForOrderIdExist.Any())
+                {
+                    var main = _context.OrderMain.FirstOrDefault(x => x.Id == orderMainId);
+                    _context.OrderMain.Remove(main);
+                }
+                await _context.SaveChangesAsync();
+
+                return new ResponseMessageModel
+                {
+                    Status = true,
+                    Message = "Ваша заказ на доставку отменен!"
+                };
+            }
+            catch(Exception ex)
+            {
+                return new ResponseMessageModel
+                {
+                    Status = false,
+                    Message = ex.Message
+                };
+            }
+            
+        }
+
+        public async Task<ResponseMessageModel> DeleteOrderProvider(RequestMain model)
+        {
+            try 
+            {
+                foreach (var cargoes in model.OrderDats.Select(x => x.Cargoes))
+                {
+                    foreach (var cargo in cargoes)
+                    {
+                        var car = new Cargo
+                        {
+                            Id = cargo.Id,
+                            Name = cargo.Name,
+                            RouteMap = cargo.RouteMap,
+                            CostDelivery = cargo.CostDelivery,
+                            Height = cargo.Height,
+                            Weight = cargo.Weight,
+                            Depth = cargo.Depth,
+                            Width = cargo.Width,
+                            isStatus = cargo.isStatus,
+                            IdTypeCurrency = cargo.IdTypeCurrency,
+                            IdTypePayment = cargo.IdTypePayment,
+                            OrderDataId = cargo.OrderDataId,
+                            IdUser = cargo.IdUser
+                        };
+                        _context.Cargoes.Attach(car);
+                        car.OrderDataId = null;
+                        _context.Cargoes.Update(car);
+                    }
+                }
+
+                var orderMainId = model.OrderDats.Select(x => x.OrderMainId).FirstOrDefault();
+                var ordersData = _context.OrderData.Where(x => x.OrderMainId == orderMainId);
+
+                _context.OrderData.RemoveRange(ordersData);
+                await _context.SaveChangesAsync();
+
+                var ordersDataForOrderIdExist = _context.OrderData.Where(x => x.OrderMainId == orderMainId).ToList();
+                if (!ordersDataForOrderIdExist.Any())
+                {
+                    var main = _context.OrderMain.FirstOrDefault(x => x.Id == orderMainId);
+                    _context.OrderMain.Remove(main);
+                }
+                await _context.SaveChangesAsync();
+
+                return new ResponseMessageModel
+                {
+                    Status = true,
+                    Message = "Ваш заказ на доставку отменен!"
+                };
+            }
+            catch (Exception ex) 
+            {
+                return new ResponseMessageModel
+                {
+                    Status = false,
+                    Message = ex.Message
+                };
+            }
+            
         }
 
 
@@ -380,7 +507,6 @@ namespace AviaTm.Services.Api.ServicesController
                 _context.RequestMain.Remove(reqMain);
             }
             await _context.SaveChangesAsync();
-
 
             return new ResponseMessageModel
             {
@@ -472,7 +598,7 @@ namespace AviaTm.Services.Api.ServicesController
             return new ResponseMessageModel
             {
                 Status = true,
-                Message = "Заявка на доставку ПРинята!"
+                Message = "Заявка на доставку принята!"
             };
         }
 

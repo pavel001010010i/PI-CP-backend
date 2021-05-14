@@ -114,6 +114,22 @@ namespace AviaTM.Controllers
             return Ok(response);
         }
 
+        [HttpPost("delete-item-order-cust")]
+        [Authorize]
+        public async Task<IActionResult> DeleteOrderCustomer([FromBody] RequestMain model)
+        {
+            var response = await _context.DeleteOrderCustomer(model);
+            return Ok(response);
+        }
+
+        [HttpPost("delete-item-order-prov")]
+        [Authorize]
+        public async Task<IActionResult> DeleteOrderProvider([FromBody] RequestMain model)
+        {
+            var response = await _context.DeleteOrderProvider(model);
+            return Ok(response);
+        }
+
         [HttpPost("accept-item-request")]
         [Authorize]
         public async Task<IActionResult> AcceptItemRequest([FromBody] RequestMain model)

@@ -16,6 +16,8 @@ namespace AviaTM.Services.IServicesController
 
         IEnumerable<RequestMain> GetOrdersUserCustomer(string idUser);
         IEnumerable<RequestMain> GetOrdersUserProvider(string idUser);
+        Task<ResponseMessageModel> DeleteOrderCustomer(RequestMain model);
+        Task<ResponseMessageModel> DeleteOrderProvider(RequestMain model);
 
 
         Task<ResponseMessageModel> DeleteRequestCustomer(RequestMain model);

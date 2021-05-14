@@ -42,7 +42,27 @@ namespace AviaTm.Services.Api.ServicesController
                     IdUser = x.IdUser,
                     IdTypeTransport = x.IdTypeTransport,
                     IdTransLoadCapacity = x.IdTransLoadCapacity,
-                    IdRouteMap = x.IdRouteMap
+                    IdRouteMap = x.IdRouteMap,
+                    TransportLoadCapacity = x.TransportLoadCapacity,
+                    TypeTransport = x.TypeTransport,
+                    RouteMap = new RouteMap
+                    {
+                        CountryCodeFrom = x.RouteMap.CountryCodeFrom,
+                        CountryCodeTo = x.RouteMap.CountryCodeTo,
+                        CityFrom = x.RouteMap.CityFrom,
+                        CityTo = x.RouteMap.CityTo,
+                        latFrom = x.RouteMap.latFrom,
+                        lngFrom = x.RouteMap.lngFrom,
+                        latTo = x.RouteMap.latTo,
+                        lngTo = x.RouteMap.lngTo,
+                        CountyFrom = x.RouteMap.CountyFrom,
+                        CountyTo = x.RouteMap.CountyTo,
+                        FullAddressFrom = x.RouteMap.FullAddressFrom,
+                        FullAddressTo = x.RouteMap.FullAddressTo,
+                        Id = x.RouteMap.Id,
+                        EndDate = x.RouteMap.EndDate,
+                        StartDate = x.RouteMap.StartDate
+                    }
                 });
 
             return transports;
@@ -97,12 +117,108 @@ namespace AviaTm.Services.Api.ServicesController
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteTransport(int id)
+        public async Task<ResponseMessageModel> DeleteTransport(int id)
         {
             var transport = await _context.Transports.FindAsync(id);
+            var orderMain = await _context.OrderMain.FirstOrDefaultAsync(x => x.IdTransport == id);
+            var requestMain = await _context.RequestMain.FirstOrDefaultAsync(x => x.IdTransport == id);
 
-            _context.Transports.Remove(transport);
-            await _context.SaveChangesAsync();
+            if(requestMain!=null && orderMain != null)
+            {
+                var orderDataRequest = _context.OrderData.Include(x=>x.Cargoes)
+                    .FirstOrDefault(x => x.RequestMainId == requestMain.Id);
+                    
+                var orderDataOrder = _context.OrderData.Include(x=>x.Cargoes)
+                    .FirstOrDefault(x => x.OrderMainId == orderMain.Id);
+
+                foreach (var cargo in orderDataRequest.Cargoes)
+                {
+                    cargo.OrderDataId = null;
+                    _context.Cargoes.Update(cargo);
+                }
+                foreach (var cargo in orderDataOrder.Cargoes)
+                {
+                    cargo.OrderDataId = null;
+                    _context.Cargoes.Update(cargo);
+                }
+
+                _context.OrderData.Remove(orderDataRequest);
+                _context.OrderData.Remove(orderDataOrder);
+                await _context.SaveChangesAsync();
+
+                _context.OrderMain.Remove(orderMain);
+                _context.RequestMain.Remove(requestMain);
+                await _context.SaveChangesAsync();
+
+                _context.Transports.Remove(transport);
+                await _context.SaveChangesAsync();
+
+                return new ResponseMessageModel
+                {
+                    Status = true,
+                    Message = "Транспорт удален!"
+                };
+            }
+
+            if (requestMain != null)
+            {
+                var orderDataRequest = _context.OrderData.Include(x =>x.Cargoes)
+                    .FirstOrDefault(x => x.RequestMainId == requestMain.Id);
+
+                foreach (var cargo in orderDataRequest.Cargoes)
+                {
+                    cargo.OrderDataId = null;
+                    _context.Cargoes.Update(cargo);
+                }
+
+                _context.OrderData.Remove(orderDataRequest);
+                
+                await _context.SaveChangesAsync();
+
+                _context.RequestMain.Remove(requestMain);
+                await _context.SaveChangesAsync();
+
+                _context.Transports.Remove(transport);
+                await _context.SaveChangesAsync();
+
+                return new ResponseMessageModel
+                {
+                    Status = true,
+                    Message = "Транспорт удален!"
+                };
+            }
+            if (orderMain != null)
+            {
+                var orderDataOrder = _context.OrderData.Include(x=>x.Cargoes)
+                    .FirstOrDefault(x => x.OrderMainId == orderMain.Id);
+
+                foreach (var cargo in orderDataOrder.Cargoes)
+                {
+                    cargo.OrderDataId = null;
+                    _context.Cargoes.Update(cargo);
+                }
+
+                _context.OrderData.Remove(orderDataOrder);
+                await _context.SaveChangesAsync();
+
+                _context.OrderMain.Remove(orderMain);
+                await _context.SaveChangesAsync();
+
+                _context.Transports.Remove(transport);
+                await _context.SaveChangesAsync();
+
+                return new ResponseMessageModel
+                {
+                    Status = true,
+                    Message = "Транспорт удален!"
+                };
+            }
+            return new ResponseMessageModel
+            {
+                Status = false,
+                Message = "Транспорт не удален!"
+            };
+
         }
 
         public async Task UpdateTransport(RouteModel model)
