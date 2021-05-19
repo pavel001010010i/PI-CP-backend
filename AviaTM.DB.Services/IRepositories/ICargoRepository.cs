@@ -3,9 +3,9 @@ using AviaTM.Services.Models.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace AviaTM.Services.IServicesController
+namespace AviaTM.DB.IRepository
 {
-    public interface ICargoControllerService
+    public interface ICargoRepository
     {
         IEnumerable<Cargo> GetCargos();
         IEnumerable<Cargo> GetCargoesForSelectRequest();

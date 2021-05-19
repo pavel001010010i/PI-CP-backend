@@ -1,6 +1,6 @@
 ﻿using AviaTM;
+using AviaTM.DB.IRepository;
 using AviaTM.DB.Model.Models;
-using AviaTM.Services.IServicesController;
 using AviaTM.Services.Models.Models;
 using Constant;
 using Microsoft.AspNetCore.Identity;
@@ -16,22 +16,19 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace AviaTm.Services.Api.ServicesController
+namespace AviaTm.DB.Repository
 {
-    public class AccountControllerService : IAccountControllerService
+    public class AccountRepository : IAccountRepository
     {
         public ApplicationDbContext _context;
         private readonly UserManager<AppUser> _userManager;
-        private readonly SignInManager<AppUser> _signInManager;
         private readonly IOptions<AuthorizationSettings> _authSettings;
-        public AccountControllerService(ApplicationDbContext context, 
+        public AccountRepository(ApplicationDbContext context, 
             UserManager<AppUser> userManager, 
-            SignInManager<AppUser> signInManager, 
             IOptions<AuthorizationSettings> authSettings)
         {
             _context = context;
             _userManager = userManager;
-            _signInManager = signInManager;
             _authSettings = authSettings;
         }
         public async Task<ResponseMessageModel> RegistrationUser(RegisterUserModel model)
@@ -144,5 +141,6 @@ namespace AviaTm.Services.Api.ServicesController
 
         private static long ToUnixEpochDate(DateTime date)
             => (long)Math.Round((date.ToUniversalTime() - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero)).TotalSeconds);
+
     }
 }

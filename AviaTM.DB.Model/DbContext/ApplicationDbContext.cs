@@ -25,7 +25,6 @@ namespace AviaTM
         public DbSet<TypeCurrency> TypeCurrency{ get; set; }
         public DbSet<TypeTransport> TypeTransports{ get; set; }
         public DbSet<TransportLoadCapacity> TransportLoadCapacity { get; set; }
-        //public DbSet<TypeUser> TypeUsers{ get; set; }
         public DbSet<Transport> Transports{ get; set; }
 
 

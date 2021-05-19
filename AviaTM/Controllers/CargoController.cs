@@ -58,17 +58,17 @@ namespace AviaTM.Controllers
 
         [HttpGet("get-cargoes")]
         [Authorize]
-        public async Task<IActionResult> GetCargo()
+        public IActionResult GetCargo()
         {
-            var cargoes = await _context.GetCargos();
+            var cargoes = _context.GetCargos();
             return Ok(cargoes);
         }
 
         [HttpGet("get-cargoes-request")]
         [Authorize]
-        public async Task<IActionResult> GetCargoesForSelectRequest()
+        public IActionResult GetCargoesForSelectRequest()
         {
-            var cargoes = await _context.GetCargoesForSelectRequest();
+            var cargoes = _context.GetCargoesForSelectRequest();
             return Ok(cargoes);
         }
 

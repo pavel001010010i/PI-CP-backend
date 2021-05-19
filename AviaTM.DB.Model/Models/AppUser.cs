@@ -1,11 +1,5 @@
-﻿using AviaTM.DB.Model.Models;
-using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace AviaTM.DB.Model.Models
 {
@@ -18,7 +12,6 @@ namespace AviaTM.DB.Model.Models
         public string AnotherContact { get; set; }
         public string Address { get; set; }
         public bool isLockdown { get; set; }
-
     }
 
     public class UserBody

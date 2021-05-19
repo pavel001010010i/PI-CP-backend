@@ -1,30 +1,27 @@
 ﻿using AviaTM;
+using AviaTM.DB.IRepository;
 using AviaTM.DB.Model.Models;
-using AviaTM.Services.IServicesController;
 using AviaTM.Services.Models.Infastructure;
 using AviaTM.Services.Models.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace AviaTm.Services.Api.ServicesController
+namespace AviaTm.DB.Repository
 {
-    public class TransportControllerService : ITransportControllerService
+    public class TransportRepository : ITransportRepository
     {
         private readonly ApplicationDbContext _context;
         private readonly UserContext _userContext;
 
-        public TransportControllerService(ApplicationDbContext context, UserContext userContext)
+        public TransportRepository(ApplicationDbContext context, UserContext userContext)
         {
             _context = context;
             _userContext = userContext;
         }
 
-        public async Task<IEnumerable<Transport>> GetTransports()
+        public IEnumerable<Transport> GetTransports()
         {
             var transports = _context.Transports.Where(x => x.IdUser.Contains(_userContext.UserId)).OrderByDescending(x => x.Id)
                 .Select(x => new Transport
