@@ -187,7 +187,11 @@ namespace AviaTm.Services.Api.ServicesController
                          Height = x.Transport.Height,
                          Width = x.Transport.Width,
                          Depth = x.Transport.Depth,
-                         MaxLoadCapacity = x.Transport.MaxLoadCapacity
+                         MaxLoadCapacity = x.Transport.MaxLoadCapacity,
+                         AppUser = x.Transport.AppUser,
+                         FuelConsumption = x.Transport.FuelConsumption,
+                         TypeTransport = x.Transport.TypeTransport,
+                         TransportLoadCapacity = x.Transport.TransportLoadCapacity
 
                      },
                      OrderDats = x.OrderDats.Select(x => new OrderData

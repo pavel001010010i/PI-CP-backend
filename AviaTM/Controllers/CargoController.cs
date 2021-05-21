@@ -19,31 +19,6 @@ namespace AviaTM.Controllers
 
         public CargoController(ICargoControllerService context) => _context = context;
 
-        [HttpPost("search-cargo")]
-        public async Task<IActionResult> Search([FromBody] SearchtModel model)
-        {
-            var cargoes = await _context.SearchCargo(model);
-
-            return Ok(cargoes);
-        }
-
-        [HttpPost("add-cargo")]
-        [Authorize]
-        public async Task<IActionResult> AddCargo([FromBody] RouteModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            if (model == null)
-            {
-                return BadRequest();
-            }
-
-            await _context.AddCargos(model);
-            return Ok();
-        }
-
         [HttpGet("get-cargo/{id}")]
         [Authorize]
         public async Task<IActionResult> GetCargoId(int id)
@@ -70,6 +45,31 @@ namespace AviaTM.Controllers
         {
             var cargoes = _context.GetCargoesForSelectRequest();
             return Ok(cargoes);
+        }
+
+        [HttpPost("search-cargo")]
+        public async Task<IActionResult> Search([FromBody] SearchtModel model)
+        {
+            var cargoes = await _context.SearchCargo(model);
+
+            return Ok(cargoes);
+        }
+
+        [HttpPost("add-cargo")]
+        [Authorize]
+        public async Task<IActionResult> AddCargo([FromBody] RouteModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (model == null)
+            {
+                return BadRequest();
+            }
+
+            await _context.AddCargos(model);
+            return Ok();
         }
 
         [HttpPut("update-cargo")]

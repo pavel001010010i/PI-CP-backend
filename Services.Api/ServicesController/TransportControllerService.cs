@@ -122,6 +122,17 @@ namespace AviaTm.Services.Api.ServicesController
             var transport = await _context.Transports.FindAsync(id);
             var orderMain = await _context.OrderMain.FirstOrDefaultAsync(x => x.IdTransport == id);
             var requestMain = await _context.RequestMain.FirstOrDefaultAsync(x => x.IdTransport == id);
+            if(requestMain==null && orderMain == null)
+            {
+                _context.Transports.Remove(transport);
+                await _context.SaveChangesAsync();
+
+                return new ResponseMessageModel
+                {
+                    Status = true,
+                    Message = "Транспорт удален!"
+                };
+            }
 
             if(requestMain!=null && orderMain != null)
             {
@@ -213,6 +224,7 @@ namespace AviaTm.Services.Api.ServicesController
                     Message = "Транспорт удален!"
                 };
             }
+
             return new ResponseMessageModel
             {
                 Status = false,

@@ -16,20 +16,15 @@ namespace AviaTm.Services.Api.ServicesController
 {
     public class CargoControllerService : ICargoControllerService
     {
-        private readonly ApplicationDbContext _context;
-        private readonly UserContext _userContext;
         private ICargoRepository _repository;
 
-        public CargoControllerService(ApplicationDbContext context, UserContext userContext, ICargoRepository repository)
+        public CargoControllerService(ICargoRepository repository)
         {
-            _context = context;
-            _userContext = userContext;
             _repository = repository;
         }
         public async Task AddCargos(RouteModel model)
         {
             await _repository.AddCargos(model);
-            
         }
 
         public IEnumerable<Cargo> GetCargos()

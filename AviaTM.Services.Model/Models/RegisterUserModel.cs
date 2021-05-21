@@ -18,10 +18,12 @@ namespace AviaTM.Services.Models.Models
         public string Address { get; set; }
 
         [Required(ErrorMessage = "Заполните поле с моб. номером")]
+        [Phone(ErrorMessage ="Формат Моб. телефона не верный!")]
         public string PhoneNumber { get; set; }
         [Required(ErrorMessage = "Заполните поле ЛОГИН")]
         public string UserName { get; set; }
         [Required(ErrorMessage = "Заполните поле с Емайлом")]
+        [EmailAddress(ErrorMessage = "Формат Емайла не верный")]
         public string Email { get; set; }
 
         [Required]

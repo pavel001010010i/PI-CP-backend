@@ -72,7 +72,6 @@ namespace AviaTm.DB.Repository
         public IEnumerable<Cargo> GetCargos()
         {
             var cargoes = _context.Cargoes
-                
                 .Include(x => x.TypeCurrency)
                 .Include(x => x.TypePayment)
                 .Include(x=>x.TypeCargo)
@@ -147,10 +146,60 @@ namespace AviaTm.DB.Repository
 
         public async Task<IEnumerable<Cargo>> SearchCargo(SearchtModel model)
         {
-            
+
             var cargoes = _context.Cargoes
-                .Where(x=>x.isStatus)
-                .AsQueryable();
+                .Where(x => x.isStatus)
+                .Select(x => new Cargo {
+                    Id = x.Id,
+                    IdRouteMap = x.IdRouteMap,
+                    IdTypeCurrency = x.IdTypeCurrency,
+                    IdTypePayment = x.IdTypePayment,
+                    IdUser = x.IdUser,
+                    OrderDataId = x.OrderDataId,
+                    Height = x.Height,
+                    Weight = x.Weight,
+                    Depth = x.Depth,
+                    CostDelivery = x.CostDelivery,
+                    Width = x.Width,
+                    Name = x.Name,
+                    TypePayment = new TypePayment
+                    {
+                        Id = x.TypePayment.Id,
+                        Name = x.TypePayment.Name,
+                    },
+                    TypeCurrency = new TypeCurrency
+                    {
+                        Id = x.TypeCurrency.Id,
+                        Name = x.TypeCurrency.Name
+                    },
+                    TypeCargo =  x.TypeCargo,
+                    AppUser = new AppUser
+                    {
+                        Id = x.AppUser.Id,
+                        Email = x.AppUser.Email,
+                        PhoneNumber = x.AppUser.PhoneNumber,
+                        NameOrganization = x.AppUser.NameOrganization,
+                        Address = x.AppUser.Address
+                    },
+                    RouteMap = new RouteMap
+                    {
+                        Id = x.RouteMap.Id,
+                        FullAddressFrom = x.RouteMap.FullAddressFrom,
+                        FullAddressTo = x.RouteMap.FullAddressTo,
+                        StartDate = x.RouteMap.StartDate,
+                        EndDate = x.RouteMap.EndDate,
+                        CountryCodeFrom = x.RouteMap.CountryCodeFrom,
+                        CountryCodeTo = x.RouteMap.CountryCodeTo,
+                        PostCodeFrom = x.RouteMap.PostCodeFrom,
+                        PostCodeTo = x.RouteMap.PostCodeTo,
+                        CountyFrom = x.RouteMap.CountyFrom,
+                        CountyTo  = x.RouteMap.CountyTo,
+                        StateFrom = x.RouteMap.StateFrom,
+                        StateTo = x.RouteMap.StateTo,
+                        CityFrom = x.RouteMap.CityFrom,
+                        CityTo = x.RouteMap.CityTo
+                    }
+                }).AsQueryable();
 
             if (model == null)
             {
@@ -246,7 +295,7 @@ namespace AviaTm.DB.Repository
 
             if (model.StateOf != null)
             {
-                cargoes = cargoes.Where(predicate: x => x.RouteMap.StateFrom.ToUpper().Contains(model.StateOf.ToUpper()));
+                cargoes = cargoes.Where(x => x.RouteMap.StateFrom.ToUpper().Contains(model.StateOf.ToUpper()));
             }
 
             if (model.StateTo != null)
@@ -263,7 +312,7 @@ namespace AviaTm.DB.Repository
             {
                 cargoes = cargoes.Where(x => x.RouteMap.PostCodeTo.ToUpper().Contains(model.PostcodeTo.ToUpper()));
             }
-            return await cargoes.Include(x=>x.TypeCargo).OrderByDescending(x => x.Id).ToListAsync();
+            return await cargoes.OrderByDescending(x => x.Id).ToListAsync();
         }
 
         public async Task<Cargo> GetCargoId(int id)

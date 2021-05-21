@@ -63,8 +63,8 @@ namespace AviaTM.Controllers
         [Authorize]
         public async Task<IActionResult> Delete(int id)
         {
-            await _context.DeleteTransport(id);
-            return Ok();
+            var message = await _context.DeleteTransport(id);
+            return Ok(message);
         }
     }
 }
