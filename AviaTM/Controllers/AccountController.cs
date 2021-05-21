@@ -69,23 +69,32 @@ namespace AviaTM.Controllers
             var checkedUser = await _context.FindUser(model.Login);
             if (checkedUser == null) 
             {
-                return BadRequest();
-            }
-
-            if (checkedUser.isLockdown)
-            {
                 return BadRequest(new ResponseMessageModel
                 {
-                    Status=false,
-                    Message="Упс... Вы заблокированы :("
+                    Status = false,
+                    Message = "Пользователя с данным логином не существует!"
                 });
             }
 
             bool isPasswordValid = await _context.IsPasswordValid(checkedUser, model.Password);
             if (!isPasswordValid)
             {
-                return BadRequest();
+                return BadRequest(new ResponseMessageModel
+                {
+                    Status = false,
+                    Message = "Пароль не верный!"
+                });
             }
+
+            if (checkedUser.isLockdown)
+            {
+                return BadRequest(new ResponseMessageModel
+                {
+                    Status = false,
+                    Message = "Упс... Вы заблокированы :("
+                });
+            }
+
             string token = await _context.GenerateToken(checkedUser);
 
             return Ok(token);

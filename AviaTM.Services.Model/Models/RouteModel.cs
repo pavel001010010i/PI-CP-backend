@@ -19,6 +19,7 @@ namespace AviaTM.Services.Models.Models
         public string StateFrom { get; set; }
         public string StreetFrom { get; set; }
         public string PostCodeFrom { get; set; }
+        [Required(ErrorMessage = "Введите адрес отпарвки")]
         public string FullAddressFrom { get; set; }
         public string CountryCodeTo { get; set; }
         public float latTo { get; set; }
@@ -28,8 +29,11 @@ namespace AviaTM.Services.Models.Models
         public string StateTo { get; set; }
         public string StreetTo { get; set; }
         public string PostCodeTo { get; set; }
+        [Required(ErrorMessage = "Введите адрес доставки")]
         public string FullAddressTo { get; set; }
+        [Required(ErrorMessage = "Заполните поле даты 'С'")]
         public DateTime StartDate { get; set; }
+        [Required(ErrorMessage = "Заполните поле даты 'ПО' ")]
         public DateTime EndDate { get; set; }
         public CargoModel Cargo { get; set; }
         public TransportModel Transport { get; set; }

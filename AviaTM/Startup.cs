@@ -12,6 +12,8 @@ using AviaTM.Services.Models.Infastructure;
 using AviaTM.Services.IServicesController;
 using AviaTm.Services.Api.ServicesController;
 using AviaTM.DB.Model.Models;
+using AviaTM.DB.IRepository;
+using AviaTm.DB.Repository;
 
 namespace AviaTM
 {
@@ -52,6 +54,7 @@ namespace AviaTM
             .AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
+            RegisterDependenciesRepository(services);
             RegisterDependencies(services);
         }
 
@@ -119,9 +122,6 @@ namespace AviaTM
                 Task.Run(async () => await userManager.CreateAsync(user, password)).Wait();
                 Task.Run(async () => await userManager.AddToRoleAsync(user, name)).Wait();
             }
-            //Task.Run(async () => await userManager.AddToRoleAsync(user, role)).Wait();
-
-
         }
         private static void RegisterDependencies(IServiceCollection services)
         {
@@ -133,11 +133,25 @@ namespace AviaTM
             services.AddScoped<ITransportLoadCapacityControllerService, TransportLoadCapacityControllerService>();
             services.AddScoped<ITypeTransportControllerService, TypeTransportControllerService>();
             services.AddScoped<ITransportControllerService,TransportControllerService>();
-
             services.AddScoped<ITypeCargoControllerService, TypeCargoControllerService>();
             services.AddScoped<ICargoControllerService, CargoControllerService>();
             services.AddScoped<IRouteMapControllerService, RouteMapControllerService>();
             services.AddScoped<IAccountControllerService, AccountControllerService>();
+        }
+        private static void RegisterDependenciesRepository(IServiceCollection services)
+        {
+            services.AddScoped<UserContext>();
+            services.AddScoped<IRecOrdRepository, RecOrdRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ITypePaymentRepository, TypePaymentRepository>();
+            services.AddScoped<ITypeCurrencyRepository, TypeCurrencyRepository>();
+            services.AddScoped<ITransportLoadCapacityRepository, TransportLoadCapacityRepository>();
+            services.AddScoped<ITypeTransportRepository, TypeTransportRepository>();
+            services.AddScoped<ITransportRepository, TransportRepository>();
+            services.AddScoped<ITypeCargoRepository, TypeCargoRepository>();
+            services.AddScoped<ICargoRepository, CargoRepository>();
+            services.AddScoped<IRouteMapRepository, RouteMapRepository>();
+            services.AddScoped<IAccountRepository, AccountRepository>();
         }
     }
 }

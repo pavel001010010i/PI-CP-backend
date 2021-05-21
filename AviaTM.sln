@@ -23,6 +23,31 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AviaTM.Services.Models", "A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{1E578D00-9F9F-4F0A-9ECD-C093B1A6ED66}"
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "ui-aviatm", "..\ui-aviatm\", "{7DE5B26A-E1CC-4106-A61B-979364C89ED8}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_58952"
+		Debug.AspNetCompiler.PhysicalPath = "..\ui-aviatm\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_58952\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_58952"
+		Release.AspNetCompiler.PhysicalPath = "..\ui-aviatm\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_58952\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "58952"
+		SlnRelativePath = "..\ui-aviatm\"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AviaTM.DB.Repositories", "AviaTM.DB.Services\AviaTM.DB.Repositories.csproj", "{EC16CFAF-CABF-4965-B2C9-AF048827E145}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AviaTM.DB.Repositories.Api", "AviaTM.DB.Repositories.Api\AviaTM.DB.Repositories.Api.csproj", "{208699AF-7F3A-4A49-9787-5CFB2CDB4DAB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +78,18 @@ Global
 		{8EB7F74A-24EA-4316-B794-8EA22F701B0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8EB7F74A-24EA-4316-B794-8EA22F701B0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8EB7F74A-24EA-4316-B794-8EA22F701B0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DE5B26A-E1CC-4106-A61B-979364C89ED8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DE5B26A-E1CC-4106-A61B-979364C89ED8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DE5B26A-E1CC-4106-A61B-979364C89ED8}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DE5B26A-E1CC-4106-A61B-979364C89ED8}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{EC16CFAF-CABF-4965-B2C9-AF048827E145}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC16CFAF-CABF-4965-B2C9-AF048827E145}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC16CFAF-CABF-4965-B2C9-AF048827E145}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC16CFAF-CABF-4965-B2C9-AF048827E145}.Release|Any CPU.Build.0 = Release|Any CPU
+		{208699AF-7F3A-4A49-9787-5CFB2CDB4DAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{208699AF-7F3A-4A49-9787-5CFB2CDB4DAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{208699AF-7F3A-4A49-9787-5CFB2CDB4DAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{208699AF-7F3A-4A49-9787-5CFB2CDB4DAB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -64,6 +101,9 @@ Global
 		{0E02AE28-77D1-4F8F-AD2F-7D89DD742783} = {C7310A22-D30B-4C6E-9FA7-41114819B386}
 		{F81D2D2B-5733-40AE-AEF7-00C00A76643A} = {F49FBA7C-A65D-41A4-A822-8E6505438774}
 		{8EB7F74A-24EA-4316-B794-8EA22F701B0F} = {C7310A22-D30B-4C6E-9FA7-41114819B386}
+		{7DE5B26A-E1CC-4106-A61B-979364C89ED8} = {1E578D00-9F9F-4F0A-9ECD-C093B1A6ED66}
+		{EC16CFAF-CABF-4965-B2C9-AF048827E145} = {F49FBA7C-A65D-41A4-A822-8E6505438774}
+		{208699AF-7F3A-4A49-9787-5CFB2CDB4DAB} = {F49FBA7C-A65D-41A4-A822-8E6505438774}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E992FD39-53B1-4291-8069-12C3334FB251}

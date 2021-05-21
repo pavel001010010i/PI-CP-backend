@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -6,13 +6,13 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AviaTM.DB.Repositories.Api\AviaTM.DB.Repositories.Api.csproj" />
+    <ProjectReference Include="..\AviaTM.DB.Model\AviaTM.DB.Model.csproj" />
     <ProjectReference Include="..\AviaTM.DB.Services\AviaTM.DB.Repositories.csproj" />
-    <ProjectReference Include="..\Services\AviaTM.Services.csproj" />
+    <ProjectReference Include="..\AviaTM.Services.Model\AviaTM.Services.Models.csproj" />
+    <ProjectReference Include="..\Constant1\AviaTM.Constant.csproj" />
   </ItemGroup>
 
 </Project>

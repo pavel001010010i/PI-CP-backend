@@ -30,6 +30,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AviaTM.DB.Model\AviaTM.DB.Model.csproj" />
+    <ProjectReference Include="..\AviaTM.DB.Repositories.Api\AviaTM.DB.Repositories.Api.csproj" />
+    <ProjectReference Include="..\AviaTM.DB.Services\AviaTM.DB.Repositories.csproj" />
     <ProjectReference Include="..\AviaTM.Services.Model\AviaTM.Services.Models.csproj" />
     <ProjectReference Include="..\Constant1\AviaTM.Constant.csproj" />
     <ProjectReference Include="..\Services.Api\AviaTm.Services.Api.csproj" />

@@ -1,24 +1,22 @@
 ﻿using AviaTM;
 using AviaTM.DB.Model.Models;
-using AviaTM.DB.Model;
-using AviaTM.Services.IServicesController;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using AviaTM.Services.Models.Models;
 using Microsoft.EntityFrameworkCore;
 using AviaTM.Services.Models.Infastructure;
+using AviaTM.DB.IRepository;
 
-namespace AviaTm.Services.Api.ServicesController
+namespace AviaTm.DB.Repository
 {
-    public class RecOrdControllerService : IRecOrdControllerService
+    public class RecOrdRepository : IRecOrdRepository
     {
         private readonly ApplicationDbContext _context;
         private readonly UserContext _userContext;
 
-        public RecOrdControllerService(ApplicationDbContext context, UserContext userContext)
+        public RecOrdRepository(ApplicationDbContext context, UserContext userContext)
         {
             _context = context;
             _userContext = userContext;
@@ -187,11 +185,7 @@ namespace AviaTm.Services.Api.ServicesController
                          Height = x.Transport.Height,
                          Width = x.Transport.Width,
                          Depth = x.Transport.Depth,
-                         MaxLoadCapacity = x.Transport.MaxLoadCapacity,
-                         AppUser = x.Transport.AppUser,
-                         FuelConsumption = x.Transport.FuelConsumption,
-                         TypeTransport = x.Transport.TypeTransport,
-                         TransportLoadCapacity = x.Transport.TransportLoadCapacity
+                         MaxLoadCapacity = x.Transport.MaxLoadCapacity
 
                      },
                      OrderDats = x.OrderDats.Select(x => new OrderData

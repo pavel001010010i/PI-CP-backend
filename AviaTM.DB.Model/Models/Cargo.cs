@@ -23,7 +23,6 @@ namespace AviaTM.DB.Model.Models
         [Required]
         public int CostDelivery { get; set; }
         public int? OrderDataId { get; set; }
-
         public bool isStatus { get; set; }
 
         [ForeignKey("IdUser")]
