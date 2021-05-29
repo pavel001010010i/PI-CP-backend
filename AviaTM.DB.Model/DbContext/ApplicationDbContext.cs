@@ -9,10 +9,7 @@ namespace AviaTM
     public class ApplicationDbContext : IdentityDbContext<AppUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options)
-        {
-            //Database.EnsureCreated();
-        }
+            : base(options){ }
         public ApplicationDbContext() { }
         public DbSet<AppUser> AppUsers { get; set; }
         public DbSet<Cargo> Cargoes{ get; set; }
@@ -26,7 +23,5 @@ namespace AviaTM
         public DbSet<TypeTransport> TypeTransports{ get; set; }
         public DbSet<TransportLoadCapacity> TransportLoadCapacity { get; set; }
         public DbSet<Transport> Transports{ get; set; }
-
-
     }
 }

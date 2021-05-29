@@ -36,8 +36,11 @@ namespace AviaTM
                 options.Password.RequireUppercase = false;
                 options.Password.RequiredLength = 3;
                 options.Password.RequireNonAlphanumeric = false;
+                options.Tokens.EmailConfirmationTokenProvider = TokenOptions.DefaultEmailProvider;
 
-            }).AddEntityFrameworkStores<ApplicationDbContext>();
+            })
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
             
 
             services.AddDbContext<ApplicationDbContext>(options =>
@@ -46,13 +49,18 @@ namespace AviaTM
                     Configuration.GetConnectionString("DefaultConnection"),
                     assembly =>assembly.MigrationsAssembly("AviaTM"));
             });
+
             services.Configure<AuthorizationSettings>(Configuration.GetSection("AuthorizationSettings"));
 
             services.AddControllers();
             services.AddCors();
             services.AddControllersWithViews()
+
+
             .AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
+            
 
             RegisterDependenciesRepository(services);
             RegisterDependencies(services);

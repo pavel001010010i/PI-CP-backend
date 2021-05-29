@@ -3,9 +3,11 @@ using AviaTM.DB.Model.Models;
 using AviaTM.Services.IServicesController;
 using AviaTM.Services.Models.Models;
 using Constant;
+using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using MimeKit;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -22,16 +24,14 @@ namespace AviaTm.Services.Api.ServicesController
     {
         public ApplicationDbContext _context;
         private readonly UserManager<AppUser> _userManager;
-        private readonly SignInManager<AppUser> _signInManager;
         private readonly IOptions<AuthorizationSettings> _authSettings;
+        private static string userId = "";
         public AccountControllerService(ApplicationDbContext context, 
             UserManager<AppUser> userManager, 
-            SignInManager<AppUser> signInManager, 
             IOptions<AuthorizationSettings> authSettings)
         {
             _context = context;
             _userManager = userManager;
-            _signInManager = signInManager;
             _authSettings = authSettings;
         }
         public async Task<ResponseMessageModel> RegistrationUser(RegisterUserModel model)
@@ -53,12 +53,20 @@ namespace AviaTm.Services.Api.ServicesController
                     PhoneNumber = model.PhoneNumber
                 };
 
-                await _userManager.CreateAsync(user, model.Password);
+                var result = await _userManager.CreateAsync(user, model.Password);
                 await _userManager.AddToRoleAsync(user, AspNetRoles.User);
+                if (result.Succeeded)
+                {
+                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+                    await SendEmailAsync(model.Email, "Подтверждение регистрации вашего аккаунта",
+                        $"Для подтверждения пароля используйте код: {code}");
+                }
+                userId = user.Id;
                 return new ResponseMessageModel
                 {
-                    Status = true,
-                    Message = "Регистрация прошла успешно!"
+                    Status = result.Succeeded,
+                    Message = "Для завершения регистрации проверьте электронную почту и ведите код, указанный в письме!",
                 };
             } 
             else if (userName != null)
@@ -66,7 +74,7 @@ namespace AviaTm.Services.Api.ServicesController
                 return new ResponseMessageModel
                 {
                     Status = false,
-                    Message = "Пользователь с данным ЛОГИНОМ существует!"
+                    Message = "Пользователь с данным логином существует!"
                 };
             }
             else if (userEmail != null)
@@ -74,7 +82,7 @@ namespace AviaTm.Services.Api.ServicesController
                 return new ResponseMessageModel
                 {
                     Status = false,
-                    Message = "Пользователь с данным ЕМАЙЛОМ существует!"
+                    Message = "Пользователь с данной Эл. почтой существует!"
                 };
             }
             return new ResponseMessageModel
@@ -83,6 +91,47 @@ namespace AviaTm.Services.Api.ServicesController
                 Message = "Prosto vivod"
             };
 
+        }
+        public async Task<ResponseMessageModel> ConfirmEmail(ResponseConfirmEmailModel model)
+        {
+            if (userId == null || model.Code == null)
+            {
+                return new ResponseMessageModel
+                {
+                    Status = false,
+                    Message = "Код пуст!"
+
+                };
+            }
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return new ResponseMessageModel
+                {
+                    Status = false,
+                    Message = "Пользователь не найден"
+
+                };
+            }
+            var result = await _userManager.ConfirmEmailAsync(user, model.Code);
+            if (result.Succeeded)
+                return new ResponseMessageModel
+                {
+                    Status = true,
+                    Message = "Вы подтвердили электронную почту!"
+
+                };
+            else
+                return new ResponseMessageModel
+                {
+                    Status = false,
+                    Message = "Код не верный!"
+
+                };
+        }
+        public async Task<bool> UserIsConfirmed(AppUser user)
+        {
+            return await _userManager.IsEmailConfirmedAsync(user);
         }
 
         public async Task<AppUser> FindUser(string login) 
@@ -144,5 +193,28 @@ namespace AviaTm.Services.Api.ServicesController
 
         private static long ToUnixEpochDate(DateTime date)
             => (long)Math.Round((date.ToUniversalTime() - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero)).TotalSeconds);
+
+        public async Task SendEmailAsync(string email, string subject, string message)
+        {
+            var emailMessage = new MimeMessage();
+
+            emailMessage.From.Add(new MailboxAddress("ITransport", "varetspavel@yandex.by"));
+            emailMessage.To.Add(new MailboxAddress("", email));
+            emailMessage.Subject = subject;
+            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)
+            {
+                Text = message
+            };
+
+            using (var client = new SmtpClient())
+            {
+                await client.ConnectAsync("smtp.yandex.ru", 465, true);
+                await client.AuthenticateAsync("varetspavel@yandex.by", "sioihezaodpghbts");
+                await client.SendAsync(emailMessage);
+
+                await client.DisconnectAsync(true);
+            }
+        }
     }
+
 }

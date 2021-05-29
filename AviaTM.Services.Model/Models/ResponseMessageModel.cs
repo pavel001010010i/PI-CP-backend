@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AviaTM.DB.Model.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,5 +11,17 @@ namespace AviaTM.Services.Models.Models
     {
         public bool Status { get; set; }
         public string Message { get; set; }
+    }
+
+    public class ResponseMessageUserModel
+    {
+        public bool Status { get; set; }
+        public string Message { get; set; }
+
+        public AppUser User {get; set;}
+    }
+    public class ResponseConfirmEmailModel
+    {
+        public string Code { get; set; }
     }
 }
