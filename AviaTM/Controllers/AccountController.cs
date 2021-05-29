@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using AviaTM.Services.Models.Infastructure;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using AviaTM.DB.Model.Models;
 using AviaTM.Services.Models.Models;
 using AviaTM.Services.IServicesController;
@@ -15,17 +12,11 @@ namespace AviaTM.Controllers
     {
         private readonly IAccountControllerService _context;
         private readonly UserManager<AppUser> _userManager;
-        private readonly SignInManager<AppUser> _signInManager;
-        private readonly UserContext _userContext;
         public AccountController(IAccountControllerService context,
-            UserManager<AppUser> userManager,
-            SignInManager<AppUser> signInManager,
-            UserContext userContext)
+            UserManager<AppUser> userManager)
         {
             _context = context;
             _userManager = userManager;
-            _signInManager = signInManager;
-            _userContext = userContext;
         }
 
         [HttpGet("get-user/{id}")]
@@ -57,6 +48,15 @@ namespace AviaTM.Controllers
             return Ok(responseMessage);
         }
 
+        [HttpPost("confirm-email")]
+        public async Task<IActionResult> ConfirmEmail([FromBody] ResponseConfirmEmailModel model)
+        {
+            var responseMessage = await _context.ConfirmEmail(model);
+            if (responseMessage.Status)
+                return Ok(responseMessage);
+            else
+                return BadRequest(responseMessage);
+        }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserBody model)
@@ -76,8 +76,18 @@ namespace AviaTM.Controllers
                 });
             }
 
+            if(!await _context.UserIsConfirmed(checkedUser))
+            {
+                return BadRequest(new ResponseMessageModel
+                {
+                    Status = false,
+                    Message = "Вы не подтвердили свой email!"
+                });
+            }
+
             bool isPasswordValid = await _context.IsPasswordValid(checkedUser, model.Password);
             if (!isPasswordValid)
+
             {
                 return BadRequest(new ResponseMessageModel
                 {

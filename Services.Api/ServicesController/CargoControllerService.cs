@@ -26,7 +26,6 @@ namespace AviaTm.Services.Api.ServicesController
         {
             await _repository.AddCargos(model);
         }
-
         public IEnumerable<Cargo> GetCargos()
         {
             return _repository.GetCargos();
@@ -35,7 +34,6 @@ namespace AviaTm.Services.Api.ServicesController
         {
             return _repository.GetCargoesForSelectRequest();
         }
-
         public async Task DeleteCargo(int id)
         {
             await _repository.DeleteCargo(id);

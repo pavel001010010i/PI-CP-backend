@@ -19,10 +19,8 @@ namespace AviaTM.Services.Models.Models
         [Required(ErrorMessage = "Заполните поле 'Высота' ")]
         public int Height { get; set; }
         [Required(ErrorMessage = "Заполните поле 'Широта' ")]
-
         public int Width { get; set; }
         [Required(ErrorMessage = "Заполните поле 'Глубина' ")]
-
         public int Depth { get; set; }
         [Required(ErrorMessage = "Заполните поле 'Вес' ")]
         public int Weight { get; set; }
@@ -33,6 +31,5 @@ namespace AviaTM.Services.Models.Models
 
         [Required(ErrorMessage = "Заполните поле 'Тип груза' ")]
         public ICollection<TypeCargo> TypeCargo { get; set; }
-
     }
 }
